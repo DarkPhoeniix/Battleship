@@ -37,8 +37,8 @@ void FieldWidget::Listener::paint(QPainter *painter,
                                   QWidget *widget) {}
 
 void FieldWidget::resizeEvent(QResizeEvent *event) {
-  fitInView(gridMin, gridMin, gridMax, gridMax,
-            Qt::AspectRatioMode::KeepAspectRatio);
+  fitInView(gridMin - lineWidth, gridMin - lineWidth, gridMax + lineWidth,
+            gridMax + lineWidth, Qt::AspectRatioMode::KeepAspectRatio);
 }
 
 FieldWidget::FieldWidget() : FieldWidget(QColor(Qt::darkMagenta), nullptr) {}

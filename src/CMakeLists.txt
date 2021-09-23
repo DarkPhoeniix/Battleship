@@ -1,4 +1,13 @@
-add_executable(battleship main.cpp)
+add_executable(battleship
+                main.cpp
+                game/generic_interfaces.h
+                game/battleship/abstract_game.h
+                game/battleship/enumerations.h
+                widgets/fieldwidget.h
+                widgets/fieldwidget.cpp
+                windows/mainwindow.h
+                windows/mainwindow.cpp
+                windows/mainwindow.ui)
 target_link_libraries(battleship
 		Qt::Core
 		Qt::Gui
