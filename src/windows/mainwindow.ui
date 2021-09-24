@@ -162,7 +162,7 @@
   <customwidget>
    <class>FieldWidget</class>
    <extends>QGraphicsView</extends>
-   <header>../widgets/fieldwidget.h</header>
+   <header>widgets/fieldwidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

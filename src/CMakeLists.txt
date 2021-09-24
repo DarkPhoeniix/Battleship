@@ -8,6 +8,7 @@ add_executable(battleship
                 windows/mainwindow.h
                 windows/mainwindow.cpp
                 windows/mainwindow.ui)
+include_directories(.)
 target_link_libraries(battleship
 		Qt::Core
 		Qt::Gui
