@@ -7,10 +7,26 @@ add_executable(battleship
                 widgets/fieldwidget.cpp
                 windows/mainwindow.h
                 windows/mainwindow.cpp
-                windows/mainwindow.ui)
+                windows/mainwindow.ui
+                db/database.h
+                db/database.cpp)
 include_directories(.)
 target_link_libraries(battleship
 		Qt::Core
 		Qt::Gui
 		Qt::Widgets
+                Qt::Sql
 )
+
+add_executable(database_test
+                db/database.h
+                db/database.cpp
+                db/database_test.cpp)
+target_link_libraries(database_test
+                Qt::Core
+                Qt::Gui
+                Qt::Widgets
+                Qt::Sql
+                Qt::Test
+)
+add_test(NAME DatabaseTest COMMAND database_test)
