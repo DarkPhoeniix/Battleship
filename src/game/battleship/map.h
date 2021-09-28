@@ -15,22 +15,26 @@ namespace Battleship {
     private:
         std::map<std::pair<uint8_t, uint8_t>, TileState> _map;
         std::vector<Ship> _ships;
+        bool _isBattlePhase;
+        uint8_t _setShipCoords;
 
         std::vector<std::pair<uint8_t, uint8_t>> _findShipCoords(std::pair<uint8_t, uint8_t> begin) const;
         bool _validateShips() const;
+        bool _validateShipArea(const Ship& ship) const;
         bool _hasSuchShip(const std::pair<uint8_t, uint8_t>& coordinate) const;
 
     public:
         Map();
         Map(const Map& copy);
-        Map(Map&& obj);
+        Map(Map&& obj) noexcept;
 
         Map& operator=(const Map& copy);
-        Map& operator=(Map&& obj);
+        Map& operator=(Map&& obj) noexcept;
 
         TileState getTile(const std::pair<uint8_t, uint8_t>& coordinates) const;
-        bool setTile(const std::pair<uint8_t, uint8_t>& coordinates, TileState tileState);
         const std::vector<Ship>& getShips() const;
+        bool isBattlePhase() const;
+        bool setTile(const std::pair<uint8_t, uint8_t>& coordinates, TileState tileState);
         bool setShips();
     };
 }
