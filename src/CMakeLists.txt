@@ -22,6 +22,18 @@ add_executable(database_test
                 db/database.h
                 db/database.cpp
                 db/database_test.cpp)
+add_executable(ship_test
+                game/battleship/ship.h
+                game/battleship/ship.cpp
+                game/battleship/ship_test.cpp)
+add_executable(map_test
+                game/battleship/enumerations.h
+                game/battleship/ship.h
+                game/battleship/ship.cpp
+                game/battleship/map.h
+                game/battleship/map.cpp
+                game/battleship/map_test.cpp)
+
 target_link_libraries(database_test
                 Qt::Core
                 Qt::Gui
@@ -29,4 +41,13 @@ target_link_libraries(database_test
                 Qt::Sql
                 Qt::Test
 )
+target_link_libraries(ship_test
+                Qt::Test
+)
+target_link_libraries(map_test
+                Qt::Test
+)
+
 add_test(NAME DatabaseTest COMMAND database_test)
+add_test(NAME ShipTest COMMAND ship_test)
+add_test(NAME MapTest COMMAND map_test)
