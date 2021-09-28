@@ -23,6 +23,8 @@ namespace Battleship {
 
         std::vector<std::pair<uint8_t, uint8_t>> getCoordinates() const;
         bool isDestroyed() const;
+
+        friend bool operator==(const Ship& lhs, const Ship& rhs);
     };
 }
 

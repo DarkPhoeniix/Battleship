@@ -2,7 +2,7 @@
 
 namespace Battleship {
     Ship::Ship(const std::vector<std::pair<uint8_t, uint8_t>>& coordinates, bool isDestroyed)
-        : _coordinates(coordinates), _isDestroyed(false)
+        : _coordinates(coordinates), _isDestroyed(isDestroyed)
     {   }
 
     Ship::Ship(const Ship& copy)
@@ -42,5 +42,13 @@ namespace Battleship {
 
     bool Ship::isDestroyed() const {
         return _isDestroyed;
+    }
+
+
+
+    bool operator==(const Ship& lhs, const Ship& rhs)
+    {
+        return lhs._coordinates == rhs._coordinates &&
+                lhs._isDestroyed == rhs._isDestroyed;
     }
 }
