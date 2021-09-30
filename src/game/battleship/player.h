@@ -20,14 +20,14 @@ namespace Battleship {
     public:
         Player(const std::string& name, const Map& playerMap = Map());
         Player(const Player& copy);
-        Player(Player&& obj);
+        Player(Player&& obj) noexcept;
         ~Player();
 
         Player& operator=(const Player& copy);
-        Player& operator=(Player&& obj);
+        Player& operator=(Player&& obj) noexcept;
 
-        bool attack(const std::pair<uint8_t, uint8_t>& attackCoordinate);
         bool setCoordinateState(const std::pair<uint8_t, uint8_t>& coordinate, TileState tileState);
+        bool setShips();
         void addScore(int score);
         std::string getName() const;
         const Map& getPlayerMap() const;
