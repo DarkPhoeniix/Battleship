@@ -9,8 +9,8 @@ namespace Battleship {
         ship.reserve(4);
         ship.push_back(begin);
 
-        auto checker = [*this, &ship](std::pair<uint8_t, uint8_t> cur) -> void {
-            if (_map.at(cur) != TileState::Empty &&
+        auto checker = [&map = _map, &ship](std::pair<uint8_t, uint8_t> cur) -> void {
+            if (map.at(cur) != TileState::Empty &&
             find(ship.begin(), ship.end(), cur) == ship.end())
             {
                 ship.push_back(cur);
@@ -143,14 +143,14 @@ namespace Battleship {
         : _map(copy._map),
           _ships(copy._ships),
           _isBattlePhase(copy._isBattlePhase),
-          _setShipCoords(0)
+          _setShipCoords(copy._setShipCoords)
     {   }
 
     Map::Map(Map&& obj) noexcept
         : _map(std::move(obj._map)),
           _ships(std::move(obj._ships)),
           _isBattlePhase(obj._isBattlePhase),
-          _setShipCoords(0)
+          _setShipCoords(obj._setShipCoords)
     {   }
 
 

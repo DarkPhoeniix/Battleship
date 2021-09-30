@@ -11,7 +11,7 @@ private slots:
         Battleship::Map map;
         for (uint8_t i = 0; i < 10; i++) {
             for (uint8_t j = 0; j < 10; j++) {
-            QCOMPARE(map.getTile(std::make_pair(i, j)), Battleship::TileState::Empty);
+                QCOMPARE(map.getTile(std::make_pair(i, j)), Battleship::TileState::Empty);
             }
         }
         QVERIFY(map.getShips().empty());
@@ -19,7 +19,7 @@ private slots:
         Battleship::Map mapCopy_1(map);
         for (uint8_t i = 0; i < 10; i++) {
             for (uint8_t j = 0; j < 10; j++) {
-            QCOMPARE(mapCopy_1.getTile(std::make_pair(i, j)), Battleship::TileState::Empty);
+                QCOMPARE(mapCopy_1.getTile(std::make_pair(i, j)), Battleship::TileState::Empty);
             }
         }
         QVERIFY(mapCopy_1.getShips().empty());
@@ -28,7 +28,7 @@ private slots:
         mapCopy_2 = map;
         for (uint8_t i = 0; i < 10; i++) {
             for (uint8_t j = 0; j < 10; j++) {
-            QCOMPARE(mapCopy_2.getTile(std::make_pair(i, j)), Battleship::TileState::Empty);
+                QCOMPARE(mapCopy_2.getTile(std::make_pair(i, j)), Battleship::TileState::Empty);
             }
         }
         QVERIFY(mapCopy_2.getShips().empty());
@@ -36,7 +36,7 @@ private slots:
         Battleship::Map moveCopyMap_1(std::move(mapCopy_1));
         for (uint8_t i = 0; i < 10; i++) {
             for (uint8_t j = 0; j < 10; j++) {
-            QCOMPARE(moveCopyMap_1.getTile(std::make_pair(i, j)), Battleship::TileState::Empty);
+                QCOMPARE(moveCopyMap_1.getTile(std::make_pair(i, j)), Battleship::TileState::Empty);
             }
         }
         QVERIFY(moveCopyMap_1.getShips().empty());
@@ -45,7 +45,7 @@ private slots:
         moveCopyMap_2 = std::move(mapCopy_2);
         for (uint8_t i = 0; i < 10; i++) {
             for (uint8_t j = 0; j < 10; j++) {
-            QCOMPARE(moveCopyMap_2.getTile(std::make_pair(i, j)), Battleship::TileState::Empty);
+                QCOMPARE(moveCopyMap_2.getTile(std::make_pair(i, j)), Battleship::TileState::Empty);
             }
         }
         QVERIFY(moveCopyMap_2.getShips().empty());
