@@ -42,6 +42,17 @@ add_executable(player_test
                 game/battleship/player.h
                 game/battleship/player.cpp
                 game/battleship/player_test.cpp)
+add_executable(battleshipgame_test
+                game/battleship/enumerations.h
+                game/battleship/ship.h
+                game/battleship/ship.cpp
+                game/battleship/map.h
+                game/battleship/map.cpp
+                game/battleship/player.h
+                game/battleship/player.cpp
+                game/battleship/battleshipgame.h
+                game/battleship/battleshipgame.cpp
+                game/battleship/battleshipgame_test.cpp)
 
 target_link_libraries(database_test
                 Qt::Core
@@ -59,8 +70,12 @@ target_link_libraries(map_test
 target_link_libraries(player_test
                 Qt::Test
 )
+target_link_libraries(battleshipgame_test
+                Qt::Test
+)
 
 add_test(NAME DatabaseTest COMMAND database_test)
 add_test(NAME ShipTest COMMAND ship_test)
 add_test(NAME MapTest COMMAND map_test)
 add_test(NAME PlayerTest COMMAND player_test)
+add_test(NAME BattleshipGameTest COMMAND battleshipgame_test)
