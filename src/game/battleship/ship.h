@@ -21,6 +21,7 @@ namespace Battleship {
         Ship& operator=(const Ship& copy);
         Ship& operator=(Ship&& obj) noexcept;
 
+        void setIsDestroyed(bool isDestroyed);
         std::vector<std::pair<uint8_t, uint8_t>> getCoordinates() const;
         bool isDestroyed() const;
 

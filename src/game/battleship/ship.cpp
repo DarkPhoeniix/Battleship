@@ -36,6 +36,10 @@ namespace Battleship {
 
 
 
+    void Ship::setIsDestroyed(bool isDestroyed) {
+        _isDestroyed = isDestroyed;
+    }
+
     std::vector<std::pair<uint8_t, uint8_t>> Ship::getCoordinates() const {
         return _coordinates;
     }

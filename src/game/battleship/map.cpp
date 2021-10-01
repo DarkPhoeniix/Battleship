@@ -11,7 +11,7 @@ namespace Battleship {
 
         auto checker = [&map = _map, &ship](std::pair<uint8_t, uint8_t> cur) -> void {
             if (map.at(cur) != TileState::Empty &&
-            find(ship.begin(), ship.end(), cur) == ship.end())
+                find(ship.begin(), ship.end(), cur) == ship.end())
             {
                 ship.push_back(cur);
             }
@@ -29,7 +29,7 @@ namespace Battleship {
             }
             if (cur.second < 9)
             {
-                checker({ cur.first, cur.second + 1});
+                checker({ cur.first, cur.second + 1 });
             }
             if (cur.second > 0)
             {
@@ -63,11 +63,11 @@ namespace Battleship {
                 }
             }
 
-            if (sizesOfShips != std::vector<int>{4,3,2,1}) {
+            if (sizesOfShips != std::vector<int>{4, 3, 2, 1}) {
                 result = false;
                 break;
             }
-        } while(false);
+        } while (false);
 
         return result;
     }
@@ -141,16 +141,16 @@ namespace Battleship {
 
     Map::Map(const Map& copy)
         : _map(copy._map),
-          _ships(copy._ships),
-          _isBattlePhase(copy._isBattlePhase),
-          _setShipCoords(copy._setShipCoords)
+        _ships(copy._ships),
+        _isBattlePhase(copy._isBattlePhase),
+        _setShipCoords(copy._setShipCoords)
     {   }
 
     Map::Map(Map&& obj) noexcept
         : _map(std::move(obj._map)),
-          _ships(std::move(obj._ships)),
-          _isBattlePhase(obj._isBattlePhase),
-          _setShipCoords(obj._setShipCoords)
+        _ships(std::move(obj._ships)),
+        _isBattlePhase(obj._isBattlePhase),
+        _setShipCoords(obj._setShipCoords)
     {   }
 
 
@@ -198,6 +198,27 @@ namespace Battleship {
     {
         if ((_map.at(coordinates) & tileState) == TileState::Empty) {
             _map[coordinates] = _map[coordinates] | tileState;
+
+            if ((_map.at(coordinates) & TileState::ShipAfloat) == TileState::ShipAfloat &&
+                tileState == TileState::WasShot) {
+                bool isShipDestroyed = true;
+                for (auto& item : _ships) {
+                    for (const auto& i : item.getCoordinates()) {
+                        if ((_map.at(i) & TileState::WasShot) != TileState::WasShot) {
+                            isShipDestroyed = false;
+                        }
+                    }
+                    if (isShipDestroyed) {
+                        item.setIsDestroyed(true);
+                        isShipDestroyed = true;
+
+                        for (const auto& i : item.getCoordinates()) {
+                            _map.at(i) |= TileState::ShipSunk;
+                        }
+                    }
+                }
+
+            }
             return true;
         }
         return false;
@@ -209,7 +230,7 @@ namespace Battleship {
 
         for (uint8_t i = 0; i < 10; i++) {
             for (uint8_t j = 0; j < 10; j++) {
-                std::pair<uint8_t, uint8_t> currentCoord = {i, j};
+                std::pair<uint8_t, uint8_t> currentCoord = { i, j };
                 if (!_hasSuchShip(currentCoord) && _map[currentCoord] != TileState::Empty) {
                     _ships.emplace_back(_findShipCoords(currentCoord));
                 }

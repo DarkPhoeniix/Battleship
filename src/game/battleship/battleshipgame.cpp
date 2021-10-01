@@ -16,21 +16,21 @@ namespace Battleship {
                                            uint8_t yCoordinate,
                                            uint8_t playerId)
     {
-        Player currentPlayer = (playerId == 0) ? _players.first :
-                                                 _players.second;
+        Player* currentPlayer = (playerId == 0) ? &_players.first :
+                                                  &_players.second;
         auto coordinate = std::make_pair(xCoordinate, yCoordinate);
 
-        return currentPlayer.getPlayerMap().getTile(coordinate);
+        return currentPlayer->getPlayerMap().getTile(coordinate);
     }
 
     TurnStatus BattleshipGame::registerTurn(uint8_t xCoordinate,
                                             uint8_t yCoordinate,
                                             uint8_t playerId)
     {
-        Player currentPlayer = (playerId == 0) ? _players.first :
-                                                 _players.second;
+        Player* currentPlayer = (playerId == 0) ? &_players.second :
+                                                  &_players.first;
         auto coordinates = std::make_pair(xCoordinate, yCoordinate);
-        auto currentCoord = currentPlayer.getPlayerMap().getTile(coordinates);
+        auto currentCoord = currentPlayer->getPlayerMap().getTile(coordinates);
         TurnStatus result = TurnStatus::Ok;
 
         do {
@@ -44,10 +44,12 @@ namespace Battleship {
             }
         } while(false);
 
-        if (result == TurnStatus::Ok &&
-            (currentCoord & TileState::ShipAfloat) != TileState::ShipAfloat)
+        if (result == TurnStatus::Ok)
         {
-            _idOfTurn = (playerId + 1) % 2;
+            if ((currentCoord & TileState::ShipAfloat) != TileState::ShipAfloat) {
+                _idOfTurn = (_idOfTurn + 1) % 2;
+            }
+            currentPlayer->setCoordinateState(coordinates, TileState::WasShot);
         }
         return result;
     }
@@ -56,15 +58,14 @@ namespace Battleship {
                                           uint8_t yCoordinate,
                                           uint8_t playerId)
     {
-        Player currentPlayer = (playerId == 0) ? _players.first :
-                                                 _players.second;
+        Player *currentPlayer = (playerId == 0) ? &_players.first :
+                                                  &_players.second;
         auto coordinates = std::make_pair(xCoordinate, yCoordinate);
-        bool isPlacementCorrect = currentPlayer.setCoordinateState(coordinates, TileState::ShipAfloat);
-        currentPlayer.setShips();
+        bool isPlacementCorrect = currentPlayer->setCoordinateState(coordinates, TileState::ShipAfloat);
         MappingStatus result = MappingStatus::Ok;
 
         do {
-            if (currentPlayer.getPlayerMap().isBattlePhase()) {
+            if (currentPlayer->getPlayerMap().isBattlePhase()) {
                 result = MappingStatus::WrongPhaseError;
                 break;
             }
@@ -74,6 +75,7 @@ namespace Battleship {
             }
         } while(false);
 
+        currentPlayer->setShips();
         return result;
     }
 
