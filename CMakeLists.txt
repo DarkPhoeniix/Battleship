@@ -14,5 +14,6 @@ find_package(Qt6 COMPONENTS
 		Test
 		REQUIRED)
 
+add_subdirectory(3rdparty)
 enable_testing()
 add_subdirectory(src)
