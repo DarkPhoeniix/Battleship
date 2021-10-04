@@ -24,7 +24,8 @@ std::unique_ptr<Battleship::AbstractBattleshipGame>
 Battleship::ServerWrapper::wrap(
     std::unique_ptr<Battleship::AbstractBattleshipGame> &&game,
     unsigned short port) {
-  auto wrapper = std::make_unique<ServerWrapper>(std::move(game), port);
+  auto wrapper =
+      std::unique_ptr<ServerWrapper>(new ServerWrapper(std::move(game), port));
   wrapper->initServer();
   return wrapper;
 }

@@ -9,9 +9,6 @@ class ServerWrapper : public AbstractBattleshipGame {
   std::unique_ptr<AbstractBattleshipGame> _game;
   rpc::server _server;
   rpc::client _client;
-  friend std::unique_ptr<ServerWrapper>
-  std::make_unique<ServerWrapper>(std::unique_ptr<AbstractBattleshipGame> &&,
-                                  unsigned short &);
   ServerWrapper(std::unique_ptr<AbstractBattleshipGame> &&game,
                 unsigned short port);
   void initServer();
