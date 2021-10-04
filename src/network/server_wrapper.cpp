@@ -7,14 +7,29 @@ Battleship::ServerWrapper::ServerWrapper(
       _updateCallback(updateCallback) {}
 
 void Battleship::ServerWrapper::initServer() {
+  _server.bind("subscribe", [this](const std::string &ip, unsigned short port) {
+    _subscribers.emplace_back(ip, port);
+  });
   _server.bind("getTileState", [this](uint8_t x, uint8_t y, uint8_t playerId) {
     return static_cast<int>(_game->getTileState(x, y, playerId));
   });
   _server.bind("registerTurn", [this](uint8_t x, uint8_t y, uint8_t playerId) {
-    return static_cast<int>(_game->registerTurn(x, y, playerId));
+    auto res = _game->registerTurn(x, y, playerId);
+    _updateCallback(x, y, playerId);
+    for (const auto &sub : _subscribers) {
+      rpc::client c(sub.first, sub.second);
+      c.call("update", x, y, playerId);
+    }
+    return static_cast<int>(res);
   });
   _server.bind("addTile", [this](uint8_t x, uint8_t y, uint8_t playerId) {
-    return static_cast<int>(_game->addTile(x, y, playerId));
+    auto res = _game->addTile(x, y, playerId);
+    _updateCallback(x, y, playerId);
+    for (const auto &sub : _subscribers) {
+      rpc::client c(sub.first, sub.second);
+      c.call("update", x, y, playerId);
+    }
+    return static_cast<int>(res);
   });
   _server.bind("finished", [this](uint8_t playerId) {
     return static_cast<int>(_game->finished(playerId));
@@ -43,16 +58,14 @@ Battleship::ServerWrapper::getTileState(uint8_t x, uint8_t y,
 Battleship::TurnStatus
 Battleship::ServerWrapper::registerTurn(uint8_t x, uint8_t y,
                                         uint8_t playerId) {
-  auto res = _client.call("registerTurn", x, y, playerId).as<int>();
-  _updateCallback(x, y, playerId);
-  return static_cast<TurnStatus>(res);
+  return static_cast<TurnStatus>(
+      _client.call("registerTurn", x, y, playerId).as<int>());
 }
 
 Battleship::MappingStatus
 Battleship::ServerWrapper::addTile(uint8_t x, uint8_t y, uint8_t playerId) {
-  auto res = _client.call("addTile", x, y, playerId).as<int>();
-  _updateCallback(x, y, playerId);
-  return static_cast<MappingStatus>(res);
+  return static_cast<MappingStatus>(
+      _client.call("addTile", x, y, playerId).as<int>());
 }
 
 Battleship::TerminationStatus

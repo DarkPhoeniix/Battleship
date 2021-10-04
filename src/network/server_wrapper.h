@@ -11,6 +11,7 @@ class ServerWrapper : public AbstractBattleshipGame {
   rpc::server _server;
   rpc::client _client;
   std::function<void(uint8_t, uint8_t, uint8_t)> _updateCallback;
+  std::vector<std::pair<std::string, unsigned short>> _subscribers;
   ServerWrapper(
       std::unique_ptr<AbstractBattleshipGame> &&game, unsigned short port,
       std::function<void(uint8_t, uint8_t, uint8_t)> updateCallback =
