@@ -16,8 +16,10 @@ target_link_libraries(battleship
         Qt::Gui
         Qt::Widgets
         Qt::Sql
+        rpc
 )
 add_subdirectory(db)
 add_subdirectory(game)
+add_subdirectory(network)
 add_subdirectory(widgets)
 add_subdirectory(windows)
