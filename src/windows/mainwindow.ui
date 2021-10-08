@@ -144,19 +144,44 @@
      <height>21</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuPlay">
+    <property name="title">
+     <string>Play</string>
+    </property>
+    <addaction name="actionLocal"/>
+    <addaction name="actionHost"/>
+    <addaction name="actionConnect"/>
+   </widget>
+   <widget class="QMenu" name="menuScoreboard">
+    <property name="title">
+     <string>Scoreboard</string>
+    </property>
+    <addaction name="actionSummary"/>
+   </widget>
+   <addaction name="menuPlay"/>
+   <addaction name="menuScoreboard"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <widget class="QToolBar" name="toolBar">
-   <property name="windowTitle">
-    <string>toolBar</string>
+  <action name="actionLocal">
+   <property name="text">
+    <string>Single screen</string>
    </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-  </widget>
+  </action>
+  <action name="actionHost">
+   <property name="text">
+    <string>Host a game</string>
+   </property>
+  </action>
+  <action name="actionSummary">
+   <property name="text">
+    <string>Summary</string>
+   </property>
+  </action>
+  <action name="actionConnect">
+   <property name="text">
+    <string>Connect to game</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -166,5 +191,25 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>actionSummary</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>showScoreboardSummary()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>showScoreboardSummary()</slot>
+ </slots>
 </ui>

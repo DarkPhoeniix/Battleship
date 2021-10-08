@@ -9,6 +9,9 @@ add_executable(battleship
                 windows/mainwindow.h
                 windows/mainwindow.cpp
                 windows/mainwindow.ui
+                windows/scoreboardwindow.cpp
+                windows/scoreboardwindow.h
+                windows/scoreboardwindow.ui
                 db/database.h
                 db/database.cpp)
 target_link_libraries(battleship

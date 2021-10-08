@@ -16,6 +16,8 @@ public:
 
 private:
   Ui::MainWindow *ui;
+private slots:
+  void showScoreboardSummary();
 };
 
 #endif // MAINWINDOW_H
