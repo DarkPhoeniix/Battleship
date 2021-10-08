@@ -18,6 +18,9 @@ private:
   Ui::MainWindow *ui;
 private slots:
   void showScoreboardSummary();
+  void startSingleScreenGame();
+  void hostGame();
+  void connectToGame();
 };
 
 #endif // MAINWINDOW_H

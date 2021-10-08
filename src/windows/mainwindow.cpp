@@ -15,3 +15,9 @@ void MainWindow::showScoreboardSummary() {
   window->view()->setModel(Battleship::Database::Instance().summary());
   window->show();
 }
+
+void MainWindow::startSingleScreenGame() {}
+
+void MainWindow::hostGame() {}
+
+void MainWindow::connectToGame() {}

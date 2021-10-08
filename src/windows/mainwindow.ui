@@ -208,8 +208,59 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionLocal</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>startSingleScreenGame()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>449</x>
+     <y>299</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionHost</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>hostGame()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionConnect</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>connectToGame()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>showScoreboardSummary()</slot>
+  <slot>startSingleScreenGame()</slot>
+  <slot>hostGame()</slot>
+  <slot>connectToGame()</slot>
  </slots>
 </ui>
