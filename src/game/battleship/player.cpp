@@ -39,17 +39,17 @@ namespace Battleship {
 
 
 
-    bool Player::setCoordinateState(const std::pair<uint8_t, uint8_t>& coordinate, TileState tileState)
+    bool Player::setCoordinateState(const Coordinate& Coordinate, TileState tileState)
     {
-        return _playerMap.setTile(coordinate, tileState);
+        return _playerMap.setTile(Coordinate, tileState);
     }
 
     bool Player::setShips()
     {
         int shipCounter = 0;
-        for (int i = 0; i < 10; ++i) {
-            for (int j = 0; j < 10; j++) {
-                if ((_playerMap.getTile({i, j}) & TileState::ShipAfloat) != TileState::Empty) {
+        for (int i = 0; i < Map::MAP_SIZE; ++i) {
+            for (int j = 0; j < Map::MAP_SIZE; j++) {
+                if ((_playerMap.getTile(Coordinate(i, j)) & TileState::ShipAfloat) != TileState::Empty) {
                     shipCounter++;
                 }
             }
@@ -58,7 +58,7 @@ namespace Battleship {
         return (shipCounter == 20) ? _playerMap.setShips() : false;
     }
 
-    void Player::addScore(int score)
+    void Player::addScore(unsigned score)
     {
        _score += score;
     }
@@ -73,7 +73,7 @@ namespace Battleship {
         return _playerMap;
     }
 
-    int Player::getScore() const
+    unsigned Player::getScore() const
     {
         return _score;
     }

@@ -8,7 +8,7 @@ private slots:
     void initTestCase() { }
 
     void testObjectConstruction() {
-        Battleship::Player pl("Player");
+        Battleship::Player pl(std::string("Player"));
 
         QCOMPARE(pl.getName(), std::string("Player"));
         QCOMPARE(pl.getPlayerMap().getShips(), std::vector<Battleship::Ship>());
@@ -16,10 +16,10 @@ private slots:
     }
 
     void testObjectCopying() {
-        Battleship::Player pl_1("Player");
+        Battleship::Player pl_1(std::string("Player"));
 
         Battleship::Player pl_2(pl_1);
-        Battleship::Player pl_3("None");
+        Battleship::Player pl_3(std::string("None"));
         pl_3 = pl_1;
 
         QCOMPARE(pl_2.getName(), std::string("Player"));
@@ -32,7 +32,7 @@ private slots:
     }
 
     void testObjectMoving() {
-        Battleship::Player pl_1("Player");
+        Battleship::Player pl_1(std::string("Player"));
 
         Battleship::Player pl_2(std::move(pl_1));
 
@@ -43,7 +43,7 @@ private slots:
         QCOMPARE(pl_2.getPlayerMap().getShips(), std::vector<Battleship::Ship>());
         QCOMPARE(pl_2.getScore(), 0);
 
-        Battleship::Player pl_3("None");
+        Battleship::Player pl_3(std::string("None"));
         pl_3 = std::move(pl_2);
 
         QCOMPARE(pl_3.getName(), std::string("Player"));
@@ -52,7 +52,7 @@ private slots:
     }
 
     void testCoordAnsShipSetting() {
-        Battleship::Player pl("Player");
+        Battleship::Player pl(std::string("Player1"));
 
         QVERIFY(!pl.setShips());
 
@@ -86,7 +86,9 @@ private slots:
         QVERIFY(pl.setCoordinateState({4,6}, Battleship::TileState::ShipAfloat));
         QVERIFY(pl.setCoordinateState({4,7}, Battleship::TileState::ShipAfloat));
 
-        QVERIFY(pl.setCoordinateState({2,1}, Battleship::TileState::WasShot));
+        QVERIFY(pl.setShips());
+
+        QVERIFY(!pl.setCoordinateState(Battleship::Coordinate(2,1), Battleship::TileState::ShipAfloat));
 
         QVERIFY(pl.setCoordinateState({2,6}, Battleship::TileState::WasShot));
         QVERIFY(pl.setCoordinateState({2,7}, Battleship::TileState::WasShot));
@@ -97,25 +99,51 @@ private slots:
         QVERIFY(pl.setCoordinateState({4,0}, Battleship::TileState::WasShot | Battleship::TileState::ShipSunk));
         QVERIFY(pl.setCoordinateState({4,1}, Battleship::TileState::WasShot | Battleship::TileState::ShipSunk));
         QVERIFY(pl.setCoordinateState({4,2}, Battleship::TileState::WasShot | Battleship::TileState::ShipSunk));
-
-        QVERIFY(pl.setShips());
     }
 
     void testCoordGetting() {
-        Battleship::Player pl("MyPlayer");
+        Battleship::Player pl(std::string("MyPlayer"));
 
-        pl.setCoordinateState({0,0}, Battleship::TileState::ShipAfloat);
-        pl.setCoordinateState({2,2}, Battleship::TileState::ShipAfloat);
-        pl.setCoordinateState({9,9}, Battleship::TileState::ShipAfloat);
+        QVERIFY(pl.setCoordinateState({0,0}, Battleship::TileState::ShipAfloat));
 
-        pl.setCoordinateState({2,2}, Battleship::TileState::WasShot);
+        QVERIFY(pl.setCoordinateState({9,9}, Battleship::TileState::ShipAfloat));
+
+        QVERIFY(pl.setCoordinateState({0,4}, Battleship::TileState::ShipAfloat));
+
+        QVERIFY(pl.setCoordinateState({0,6}, Battleship::TileState::ShipAfloat));
+
+        QVERIFY(pl.setCoordinateState({0,8}, Battleship::TileState::ShipAfloat));
+        QVERIFY(pl.setCoordinateState({0,9}, Battleship::TileState::ShipAfloat));
+
+        QVERIFY(pl.setCoordinateState({2,0}, Battleship::TileState::ShipAfloat));
+        QVERIFY(pl.setCoordinateState({2,1}, Battleship::TileState::ShipAfloat));
+
+        QVERIFY(pl.setCoordinateState({2,3}, Battleship::TileState::ShipAfloat));
+        QVERIFY(pl.setCoordinateState({2,4}, Battleship::TileState::ShipAfloat));
+
+        QVERIFY(pl.setCoordinateState({2,6}, Battleship::TileState::ShipAfloat));
+        QVERIFY(pl.setCoordinateState({2,7}, Battleship::TileState::ShipAfloat));
+        QVERIFY(pl.setCoordinateState({2,8}, Battleship::TileState::ShipAfloat));
+
+        QVERIFY(pl.setCoordinateState({4,0}, Battleship::TileState::ShipAfloat));
+        QVERIFY(pl.setCoordinateState({4,1}, Battleship::TileState::ShipAfloat));
+        QVERIFY(pl.setCoordinateState({4,2}, Battleship::TileState::ShipAfloat));
+
+        QVERIFY(pl.setCoordinateState({4,4}, Battleship::TileState::ShipAfloat));
+        QVERIFY(pl.setCoordinateState({4,5}, Battleship::TileState::ShipAfloat));
+        QVERIFY(pl.setCoordinateState({4,6}, Battleship::TileState::ShipAfloat));
+        QVERIFY(pl.setCoordinateState({4,7}, Battleship::TileState::ShipAfloat));
+
+        QVERIFY(pl.setShips());
+
+        pl.setCoordinateState({2,1}, Battleship::TileState::WasShot);
         pl.setCoordinateState({9,9}, Battleship::TileState::WasShot);
         pl.setCoordinateState({9,9}, Battleship::TileState::ShipSunk);
 
         QCOMPARE(pl.getPlayerMap().getTile({0,0}), Battleship::TileState::Empty |
                                                    Battleship::TileState::ShipAfloat);
         QCOMPARE(pl.getPlayerMap().getTile({3,3}), Battleship::TileState::Empty);
-        QCOMPARE(pl.getPlayerMap().getTile({2,2}), Battleship::TileState::Empty |
+        QCOMPARE(pl.getPlayerMap().getTile({2,1}), Battleship::TileState::Empty |
                                                    Battleship::TileState::ShipAfloat |
                                                    Battleship::TileState::WasShot);
         QCOMPARE(pl.getPlayerMap().getTile({9,9}), Battleship::TileState::Empty |
@@ -124,10 +152,80 @@ private slots:
                                                    Battleship::TileState::ShipSunk);
     }
 
+    void testAllShipsDestroying() {
+        Battleship::Player pl(std::string("MyPlayer"));
+
+        QVERIFY(pl.setCoordinateState({0,0}, Battleship::TileState::ShipAfloat));
+
+        QVERIFY(pl.setCoordinateState({9,9}, Battleship::TileState::ShipAfloat));
+
+        QVERIFY(pl.setCoordinateState({0,4}, Battleship::TileState::ShipAfloat));
+
+        QVERIFY(pl.setCoordinateState({0,6}, Battleship::TileState::ShipAfloat));
+
+        QVERIFY(pl.setCoordinateState({0,8}, Battleship::TileState::ShipAfloat));
+        QVERIFY(pl.setCoordinateState({0,9}, Battleship::TileState::ShipAfloat));
+
+        QVERIFY(pl.setCoordinateState({2,0}, Battleship::TileState::ShipAfloat));
+        QVERIFY(pl.setCoordinateState({2,1}, Battleship::TileState::ShipAfloat));
+
+        QVERIFY(pl.setCoordinateState({2,3}, Battleship::TileState::ShipAfloat));
+        QVERIFY(pl.setCoordinateState({2,4}, Battleship::TileState::ShipAfloat));
+
+        QVERIFY(pl.setCoordinateState({2,6}, Battleship::TileState::ShipAfloat));
+        QVERIFY(pl.setCoordinateState({2,7}, Battleship::TileState::ShipAfloat));
+        QVERIFY(pl.setCoordinateState({2,8}, Battleship::TileState::ShipAfloat));
+
+        QVERIFY(pl.setCoordinateState({4,0}, Battleship::TileState::ShipAfloat));
+        QVERIFY(pl.setCoordinateState({4,1}, Battleship::TileState::ShipAfloat));
+        QVERIFY(pl.setCoordinateState({4,2}, Battleship::TileState::ShipAfloat));
+
+        QVERIFY(pl.setCoordinateState({4,4}, Battleship::TileState::ShipAfloat));
+        QVERIFY(pl.setCoordinateState({4,5}, Battleship::TileState::ShipAfloat));
+        QVERIFY(pl.setCoordinateState({4,6}, Battleship::TileState::ShipAfloat));
+        QVERIFY(pl.setCoordinateState({4,7}, Battleship::TileState::ShipAfloat));
+
+        QVERIFY(pl.setShips());
+
+        QVERIFY(pl.setCoordinateState({0,0}, Battleship::TileState::WasShot));
+
+        QVERIFY(pl.setCoordinateState({9,9}, Battleship::TileState::WasShot));
+
+        QVERIFY(pl.setCoordinateState({0,4}, Battleship::TileState::WasShot));
+
+        QVERIFY(pl.setCoordinateState({0,6}, Battleship::TileState::WasShot));
+
+        QVERIFY(pl.setCoordinateState({0,8}, Battleship::TileState::WasShot));
+        QVERIFY(pl.setCoordinateState({0,9}, Battleship::TileState::WasShot));
+
+        QVERIFY(pl.setCoordinateState({2,0}, Battleship::TileState::WasShot));
+        QVERIFY(pl.setCoordinateState({2,1}, Battleship::TileState::WasShot));
+
+        QVERIFY(pl.setCoordinateState({2,3}, Battleship::TileState::WasShot));
+        QVERIFY(pl.setCoordinateState({2,4}, Battleship::TileState::WasShot));
+
+        QVERIFY(pl.setCoordinateState({2,6}, Battleship::TileState::WasShot));
+        QVERIFY(pl.setCoordinateState({2,7}, Battleship::TileState::WasShot));
+        QVERIFY(pl.setCoordinateState({2,8}, Battleship::TileState::WasShot));
+
+        QVERIFY(pl.setCoordinateState({4,0}, Battleship::TileState::WasShot));
+        QVERIFY(pl.setCoordinateState({4,1}, Battleship::TileState::WasShot));
+        QVERIFY(pl.setCoordinateState({4,2}, Battleship::TileState::WasShot));
+
+        QVERIFY(pl.setCoordinateState({4,4}, Battleship::TileState::WasShot));
+        QVERIFY(pl.setCoordinateState({4,5}, Battleship::TileState::WasShot));
+        QVERIFY(pl.setCoordinateState({4,6}, Battleship::TileState::WasShot));
+        QVERIFY(pl.setCoordinateState({4,7}, Battleship::TileState::WasShot));
+
+        for (const auto& ship : pl.getPlayerMap().getShips()) {
+            QCOMPARE(ship.isDestroyed(), true);
+        }
+    }
+
     void testNameSetterAndGetter() {
-        Battleship::Player pl_1("Player1");
+        Battleship::Player pl_1(std::string("Player1"));
         Battleship::Player pl_2(pl_1);
-        Battleship::Player pl_3("Unknown");
+        Battleship::Player pl_3(std::string("Unknown"));
         pl_3 = pl_1;
 
         QCOMPARE(pl_1.getName(), std::string("Player1"));
@@ -135,7 +233,7 @@ private slots:
         QCOMPARE(pl_3.getName(), std::string("Player1"));
 
         Battleship::Player pl_4(std::move(pl_1));
-        Battleship::Player pl_5("Unknown");
+        Battleship::Player pl_5(std::string("Unknown"));
         pl_5 = std::move(pl_2);
 
         QCOMPARE(pl_4.getName(), std::string("Player1"));
@@ -143,7 +241,7 @@ private slots:
     }
 
     void testScoreCounter() {
-        Battleship::Player pl("Player");
+        Battleship::Player pl(std::string("Player1"));
 
         pl.addScore(10);
         QCOMPARE(pl.getScore(), 10);

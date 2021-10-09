@@ -15,10 +15,10 @@ namespace Battleship {
     private:
         std::string _name;
         Map _playerMap;
-        int _score;
+        unsigned _score;
 
     public:
-        Player(const std::string& name, const Map& playerMap = Map());
+        explicit Player(const std::string& name, const Map& playerMap = Map());
         Player(const Player& copy);
         Player(Player&& obj) noexcept;
         ~Player();
@@ -26,12 +26,12 @@ namespace Battleship {
         Player& operator=(const Player& copy);
         Player& operator=(Player&& obj) noexcept;
 
-        bool setCoordinateState(const std::pair<uint8_t, uint8_t>& coordinate, TileState tileState);
+        bool setCoordinateState(const Coordinate& Coordinate, TileState tileState);
         bool setShips();
-        void addScore(int score);
+        void addScore(unsigned score);
         std::string getName() const;
         const Map& getPlayerMap() const;
-        int getScore() const;
+        unsigned getScore() const;
     };
 } // namespace Battleship
 
