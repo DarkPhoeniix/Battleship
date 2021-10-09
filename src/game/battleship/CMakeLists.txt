@@ -37,3 +37,14 @@ add_executable(battleshipgame_test
         battleshipgame_test.cpp)
 target_link_libraries(battleshipgame_test Qt::Test)
 add_test(NAME BattleshipGameTest COMMAND battleshipgame_test)
+add_executable(AI_test
+        enumerations.h
+        ship.h
+        ship.cpp
+        map.h
+        map.cpp
+        AI/AI.h
+        AI/AI.cpp
+        AI/AI_test.cpp)
+target_link_libraries(AI_test Qt::Test)
+add_test(NAME AITest COMMAND AI_test)

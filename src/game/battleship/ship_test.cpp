@@ -7,7 +7,7 @@ private slots:
     void initTestCase() { }
 
     void testObjectConstruction() {
-        std::vector<std::vector<std::pair<uint8_t, uint8_t>>> coords = {
+        std::vector<std::vector<Battleship::Coordinate>> coords = {
             {{0,0}, {1,0}, {2,0}},
             {{9,9}},
             {{5,4}, {5,5}}
@@ -27,7 +27,10 @@ private slots:
     }
 
     void testObjectCopying() {
-        Battleship::Ship ship({{0,0}, {1,0}, {2,0}, {0,1}});
+        Battleship::Ship ship({{0,0},
+                               {1,0},
+                               {2,0},
+                               {0,1}});
         Battleship::Ship copyShip_1(ship);
         Battleship::Ship copyShip_2({{0,0}});
         copyShip_2 = ship;
@@ -39,7 +42,7 @@ private slots:
         Battleship::Ship moveCopyShip_2({{0,0}});
         moveCopyShip_2 = std::move(copyShip_1);
 
-        std::vector<std::pair<uint8_t, uint8_t>> empty = {};
+        std::vector<Battleship::Coordinate> empty = {};
         QCOMPARE(ship.getCoordinates(), empty);
         QCOMPARE(copyShip_1.getCoordinates(), empty);
         QCOMPARE(moveCopyShip_1, copyShip_2);

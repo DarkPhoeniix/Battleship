@@ -5,15 +5,17 @@
 #include <cstdint>
 #include <vector>
 
+#include "coordinate.h"
+
 namespace Battleship {
     class Ship
     {
     private:
-        std::vector<std::pair<uint8_t, uint8_t>> _coordinates;
+        std::vector<Coordinate> _coordinates;
         bool _isDestroyed;
 
     public:
-        Ship(const std::vector<std::pair<uint8_t, uint8_t>>& coordinates, bool isDestroyed = false);
+        Ship(const std::vector<Coordinate>& coordinates, bool isDestroyed = false);
         Ship(const Ship& copy);
         Ship(Ship&& obj) noexcept;
         ~Ship();
@@ -22,11 +24,11 @@ namespace Battleship {
         Ship& operator=(Ship&& obj) noexcept;
 
         void setIsDestroyed(bool isDestroyed);
-        std::vector<std::pair<uint8_t, uint8_t>> getCoordinates() const;
+        std::vector<Coordinate> getCoordinates() const;
         bool isDestroyed() const;
 
         friend bool operator==(const Ship& lhs, const Ship& rhs);
     };
-}
+} // namespace Battleship
 
 #endif // __SHIP_H_INCLUDED

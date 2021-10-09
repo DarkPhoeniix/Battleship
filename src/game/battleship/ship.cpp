@@ -1,7 +1,7 @@
 #include "ship.h"
 
 namespace Battleship {
-    Ship::Ship(const std::vector<std::pair<uint8_t, uint8_t>>& coordinates, bool isDestroyed)
+    Ship::Ship(const std::vector<Coordinate>& coordinates, bool isDestroyed)
         : _coordinates(coordinates), _isDestroyed(isDestroyed)
     {   }
 
@@ -40,7 +40,7 @@ namespace Battleship {
         _isDestroyed = isDestroyed;
     }
 
-    std::vector<std::pair<uint8_t, uint8_t>> Ship::getCoordinates() const {
+    std::vector<Coordinate> Ship::getCoordinates() const {
         return _coordinates;
     }
 
