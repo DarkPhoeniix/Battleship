@@ -3,6 +3,8 @@
 
 #include "game/battleship/abstract_game.h"
 #include "widgets/fieldwidget.h"
+#include <QLCDNumber>
+#include <QLineEdit>
 #include <QMainWindow>
 #include <functional>
 #include <memory>
@@ -10,6 +12,14 @@
 namespace Ui {
 class MainWindow;
 }
+
+struct PlayerUI {
+  QLineEdit *name;
+  QLineEdit *enemyName;
+  FieldWidget *field;
+  QLCDNumber *hit;
+  QLCDNumber *miss;
+};
 
 class MainWindow : public QMainWindow {
   Q_OBJECT
@@ -23,7 +33,7 @@ private:
   std::unique_ptr<Battleship::AbstractBattleshipGame> _game;
   std::function<void(int, int)>
   createClickHandler(std::shared_ptr<Battleship::AbstractBattleshipGame> game,
-                     int playerId, FieldWidget *w);
+                     int playerId, PlayerUI w);
 private slots:
   void showScoreboardSummary();
   void startSingleScreenGame();
