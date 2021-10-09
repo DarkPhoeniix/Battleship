@@ -4,6 +4,10 @@ add_executable(battleship
                 game/generic_interfaces.h
                 game/battleship/abstract_game.h
                 game/battleship/enumerations.h
+                game/battleship/battleshipgame.cpp
+                game/battleship/map.cpp
+                game/battleship/ship.cpp
+                game/battleship/player.cpp
                 widgets/fieldwidget.h
                 widgets/fieldwidget.cpp
                 windows/mainwindow.h

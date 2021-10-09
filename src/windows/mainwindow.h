@@ -1,7 +1,11 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "game/battleship/abstract_game.h"
+#include "widgets/fieldwidget.h"
 #include <QMainWindow>
+#include <functional>
+#include <memory>
 
 namespace Ui {
 class MainWindow;
@@ -16,6 +20,10 @@ public:
 
 private:
   Ui::MainWindow *ui;
+  std::unique_ptr<Battleship::AbstractBattleshipGame> _game;
+  std::function<void(int, int)>
+  createClickHandler(std::shared_ptr<Battleship::AbstractBattleshipGame> game,
+                     int playerId, FieldWidget *w);
 private slots:
   void showScoreboardSummary();
   void startSingleScreenGame();

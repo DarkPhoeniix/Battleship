@@ -31,7 +31,7 @@
        <item row="0" column="1">
         <widget class="QLineEdit" name="leftNameEdit">
          <property name="readOnly">
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -90,7 +90,7 @@
        <item row="0" column="1">
         <widget class="QLineEdit" name="rightNameEdit">
          <property name="readOnly">
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -215,8 +215,8 @@
    <slot>startSingleScreenGame()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>449</x>
-     <y>299</y>
+     <x>-1</x>
+     <y>-1</y>
     </hint>
     <hint type="destinationlabel">
      <x>449</x>
