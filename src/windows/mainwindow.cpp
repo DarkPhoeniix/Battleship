@@ -61,11 +61,12 @@ std::function<void(int, int)> MainWindow::createClickHandler(
       auto turn = game->registerTurn(x, y, enemyId);
       if (turn == Battleship::TurnStatus::Ok) {
         auto tile = game->getTileState(x, y, playerId);
-        if (static_cast<bool>(tile & Battleship::TileState::ShipAfloat)) {
-          ui.field->addFieldCross(x, y, Qt::red);
-          ui.hit->display(ui.hit->value() + 1);
-        } else if (static_cast<bool>(tile & Battleship::TileState::ShipSunk)) {
+        if (static_cast<bool>(tile & Battleship::TileState::ShipSunk)) {
           ui.field->addFieldCross(x, y, Qt::blue);
+          ui.hit->display(ui.hit->value() + 1);
+        } else if (static_cast<bool>(tile &
+                                     Battleship::TileState::ShipAfloat)) {
+          ui.field->addFieldCross(x, y, Qt::red);
           ui.hit->display(ui.hit->value() + 1);
         } else if (static_cast<bool>(tile & Battleship::TileState::WasShot)) {
           ui.field->addFieldDot(x, y, Qt::black);
@@ -104,8 +105,8 @@ void MainWindow::startSingleScreenGame() {
   uiToGameMode();
   auto game = std::shared_ptr<Battleship::AbstractBattleshipGame>(
       new Battleship::BattleshipGame(
-          {{ui->leftNameEdit->text().toStdString()},
-           {ui->rightNameEdit->text().toStdString()}}));
+          {Battleship::Player{ui->leftNameEdit->text().toStdString()},
+           Battleship::Player{ui->rightNameEdit->text().toStdString()}}));
   connect(
       ui->leftField, &FieldWidget::click,
       createClickHandler(game, 0,
@@ -135,7 +136,8 @@ void MainWindow::startHostedGame(unsigned short port, QString playerName,
   auto game = Battleship::ServerWrapper::wrap(
       std::unique_ptr<Battleship::BattleshipGame>(
           new Battleship::BattleshipGame(
-              {{playerName.toStdString()}, {opponentName.toStdString()}})),
+              {Battleship::Player{playerName.toStdString()},
+               Battleship::Player{opponentName.toStdString()}})),
       port);
   connect(
       ui->leftField, &FieldWidget::click,

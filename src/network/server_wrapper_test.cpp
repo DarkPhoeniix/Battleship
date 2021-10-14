@@ -17,7 +17,8 @@ private slots:
   void testMapper() {
     auto game = Battleship::ServerWrapper::wrap(
         std::unique_ptr<Battleship::BattleshipGame>(
-            new Battleship::BattleshipGame({{"Player_1"}, {"Player_2"}})),
+            new Battleship::BattleshipGame({Battleship::Player{"Player_1"},
+                                            Battleship::Player{"Player_2"}})),
         8800);
 
     for (const auto &item : correctCoords) {
@@ -35,7 +36,8 @@ private slots:
   void testTurnRegistrator() {
     auto game = Battleship::ServerWrapper::wrap(
         std::unique_ptr<Battleship::BattleshipGame>(
-            new Battleship::BattleshipGame({{"Player_1"}, {"Player_2"}})),
+            new Battleship::BattleshipGame({Battleship::Player{"Player_1"},
+                                            Battleship::Player{"Player_2"}})),
         8801);
 
     for (const auto &item : correctCoords) {
@@ -56,7 +58,8 @@ private slots:
   void testMapScanner() {
     auto game = Battleship::ServerWrapper::wrap(
         std::unique_ptr<Battleship::BattleshipGame>(
-            new Battleship::BattleshipGame({{"Player_1"}, {"Player_2"}})),
+            new Battleship::BattleshipGame({Battleship::Player{"Player_1"},
+                                            Battleship::Player{"Player_2"}})),
         8802);
 
     for (const auto &item : correctCoords) {
@@ -86,7 +89,8 @@ private slots:
   void testTerminationChecker() {
     auto game = Battleship::ServerWrapper::wrap(
         std::unique_ptr<Battleship::BattleshipGame>(
-            new Battleship::BattleshipGame({{"Player_1"}, {"Player_2"}})),
+            new Battleship::BattleshipGame({Battleship::Player{"Player_1"},
+                                            Battleship::Player{"Player_2"}})),
         8803);
 
     for (const auto &item : correctCoords) {
