@@ -151,7 +151,7 @@
     <addaction name="actionLocal"/>
     <addaction name="actionHost"/>
     <addaction name="actionConnect"/>
-    <addaction name="actionWith_computer"/>
+    <addaction name="actionAI"/>
    </widget>
    <widget class="QMenu" name="menuScoreboard">
     <property name="title">
@@ -183,7 +183,7 @@
     <string>Connect to game</string>
    </property>
   </action>
-  <action name="actionWith_computer">
+  <action name="actionAI">
    <property name="text">
     <string>With computer</string>
    </property>
@@ -262,11 +262,28 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionAI</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>startGameWithAI()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>showScoreboardSummary()</slot>
   <slot>startSingleScreenGame()</slot>
   <slot>hostGame()</slot>
   <slot>connectToGame()</slot>
+  <slot>startGameWithAI()</slot>
  </slots>
 </ui>

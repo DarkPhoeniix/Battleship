@@ -33,7 +33,7 @@ private:
   std::unique_ptr<Battleship::AbstractBattleshipGame> _game;
   std::function<void(int, int)>
   createClickHandler(std::shared_ptr<Battleship::AbstractBattleshipGame> game,
-                     int playerId, PlayerUI w);
+                     int playerId, PlayerUI w, bool skipMapping = false);
   void uiToGameMode();
 private slots:
   void showScoreboardSummary();
@@ -42,6 +42,7 @@ private slots:
   void startHostedGame(unsigned short port, QString playerName,
                        QString opponentName);
   void connectToGame();
+  void startGameWithAI();
 };
 
 #endif // MAINWINDOW_H

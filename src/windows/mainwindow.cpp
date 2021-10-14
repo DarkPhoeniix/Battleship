@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "db/database.h"
+#include "game/battleship/AI/AI.h"
 #include "game/battleship/battleshipgame.h"
 #include "network/server_wrapper.h"
 #include "ui_mainwindow.h"
@@ -32,12 +33,20 @@ void showWinner(const QString &winner) {
   box->show();
 };
 
+bool validateShipsInput(const QSet<QPair<int, int>> &ships) {
+  Battleship::Map map;
+  for (const auto &ship : ships)
+    map.setTile(Battleship::Coordinate(ship.first, ship.second),
+                Battleship::TileState::ShipAfloat);
+  return map.setShips();
+}
+
 std::function<void(int, int)> MainWindow::createClickHandler(
     std::shared_ptr<Battleship::AbstractBattleshipGame> game, int playerId,
-    PlayerUI ui) {
+    PlayerUI ui, bool skipMapping) {
   return [game, playerId, enemyId = std::abs(playerId - 1), ui,
           ships = QSet<QPair<int, int>>(),
-          isMappingPhase = true](int x, int y) mutable {
+          isMappingPhase = !skipMapping](int x, int y) mutable {
     if (isMappingPhase) {
       if (ships.contains({x, y})) {
         ships.remove({x, y});
@@ -46,7 +55,7 @@ std::function<void(int, int)> MainWindow::createClickHandler(
         ships.insert({x, y});
         ui.field->addFieldCross(x, y, Qt::black);
       }
-      if (ships.size() == 20) {
+      if (ships.size() == 20 && validateShipsInput(ships)) {
         for (const auto &ship : ships) {
           ui.field->removeFieldItems(ship.first, ship.second);
           auto res = game->addTile(ship.first, ship.second, playerId);
@@ -147,3 +156,57 @@ void MainWindow::startHostedGame(unsigned short port, QString playerName,
 }
 
 void MainWindow::connectToGame() {}
+
+void MainWindow::startGameWithAI() {
+  uiToGameMode();
+  ui->rightNameEdit->setText("HAL 9000");
+  Battleship::AI ai;
+  auto map = ai.generateMap();
+  map.setShips();
+  auto game = std::shared_ptr<Battleship::AbstractBattleshipGame>(
+      new Battleship::BattleshipGame(
+          {Battleship::Player{ui->leftNameEdit->text().toStdString()},
+           Battleship::Player{ui->rightNameEdit->text().toStdString(), map}}));
+  connect(
+      ui->leftField, &FieldWidget::click,
+      createClickHandler(game, 0,
+                         {ui->leftNameEdit, ui->rightNameEdit, ui->leftField,
+                          ui->rightScoredCount, ui->rightMissedCount}));
+  connect(
+      ui->rightField, &FieldWidget::click,
+      createClickHandler(game, 1,
+                         {ui->rightNameEdit, ui->leftNameEdit, ui->rightField,
+                          ui->leftScoredCount, ui->leftMissedCount},
+                         true));
+  connect(ui->rightField, &FieldWidget::click,
+          [game, field = ui->leftField, ai,
+           prev = Battleship::TileState::Empty]() mutable {
+            while (true) {
+              auto [x, y] = ai.generateAttack(prev);
+              auto turn = game->registerTurn(x, y, 1);
+              if (turn == Battleship::TurnStatus::Ok) {
+                qDebug().verbosity(QDebug::MaximumVerbosity)
+                    << "AI made a move:" << x << y;
+                auto tile = game->getTileState(x, y, 0);
+                if (static_cast<bool>(tile & Battleship::TileState::ShipSunk)) {
+                  field->addFieldCross(x, y, Qt::blue);
+                } else if (static_cast<bool>(
+                               tile & Battleship::TileState::ShipAfloat)) {
+                  field->addFieldCross(x, y, Qt::red);
+                } else if (static_cast<bool>(tile &
+                                             Battleship::TileState::WasShot)) {
+                  field->addFieldDot(x, y, Qt::black);
+                  break;
+                }
+                // ISSUE: AI probably loops if given correct data about previous
+                // tile
+                // TODO: fix infinite loop in AI and uncomment the line below
+                // prev = tile;
+              } else {
+                qDebug().verbosity(QDebug::MaximumVerbosity)
+                    << "Wrong turn status in AI:" << static_cast<int>(turn);
+                break;
+              }
+            }
+          });
+}

@@ -8,6 +8,7 @@ add_executable(battleship
                 game/battleship/map.cpp
                 game/battleship/ship.cpp
                 game/battleship/player.cpp
+                game/battleship/AI/AI.cpp
                 widgets/fieldwidget.h
                 widgets/fieldwidget.cpp
                 windows/mainwindow.h
