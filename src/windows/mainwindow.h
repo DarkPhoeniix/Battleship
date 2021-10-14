@@ -34,10 +34,13 @@ private:
   std::function<void(int, int)>
   createClickHandler(std::shared_ptr<Battleship::AbstractBattleshipGame> game,
                      int playerId, PlayerUI w);
+  void uiToGameMode();
 private slots:
   void showScoreboardSummary();
   void startSingleScreenGame();
   void hostGame();
+  void startHostedGame(unsigned short port, QString playerName,
+                       QString opponentName);
   void connectToGame();
 };
 

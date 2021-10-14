@@ -1,11 +1,14 @@
 #include "mainwindow.h"
 #include "db/database.h"
 #include "game/battleship/battleshipgame.h"
+#include "network/server_wrapper.h"
 #include "ui_mainwindow.h"
+#include "windows/hostgamedialog.h"
 #include "windows/scoreboardwindow.h"
 #include <QDebug>
 #include <QMessageBox>
 #include <QRandomGenerator>
+#include <QSet>
 #include <cmath>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -33,14 +36,27 @@ std::function<void(int, int)> MainWindow::createClickHandler(
     std::shared_ptr<Battleship::AbstractBattleshipGame> game, int playerId,
     PlayerUI ui) {
   return [game, playerId, enemyId = std::abs(playerId - 1), ui,
-          clicks = 0](int x, int y) mutable {
-    ++clicks;
-    if (clicks <= 20) {
-      auto res = game->addTile(x, y, playerId);
-      if (res != Battleship::MappingStatus::Ok)
-        qDebug().verbosity(QDebug::MinimumVerbosity)
-            << "Wrong mapping status: " << static_cast<int>(res);
-      ui.field->addFieldCross(x, y, Qt::black);
+          ships = QSet<QPair<int, int>>(),
+          isMappingPhase = true](int x, int y) mutable {
+    if (isMappingPhase) {
+      if (ships.contains({x, y})) {
+        ships.remove({x, y});
+        ui.field->removeFieldItems(x, y);
+      } else {
+        ships.insert({x, y});
+        ui.field->addFieldCross(x, y, Qt::black);
+      }
+      if (ships.size() == 20) {
+        for (const auto &ship : ships) {
+          ui.field->removeFieldItems(ship.first, ship.second);
+          auto res = game->addTile(ship.first, ship.second, playerId);
+          if (res != Battleship::MappingStatus::Ok)
+            qDebug().verbosity(QDebug::MinimumVerbosity)
+                << "Wrong mapping status: " << static_cast<int>(res);
+        }
+        ships.clear();
+        isMappingPhase = false;
+      }
     } else {
       auto turn = game->registerTurn(x, y, enemyId);
       if (turn == Battleship::TurnStatus::Ok) {
@@ -66,11 +82,16 @@ std::function<void(int, int)> MainWindow::createClickHandler(
         qDebug().verbosity(QDebug::MaximumVerbosity)
             << "Wrong turn status: " << static_cast<int>(turn);
     }
-    if (clicks == 20)
-      for (int i = 0; i < 10; ++i)
-        for (int j = 0; j < 10; ++j)
-          ui.field->removeFieldItems(i, j);
   };
+}
+
+void MainWindow::uiToGameMode() {
+  ui->leftNameEdit->setReadOnly(true);
+  ui->rightNameEdit->setReadOnly(true);
+  ui->leftScoredCount->display(0);
+  ui->leftMissedCount->display(0);
+  ui->rightScoredCount->display(0);
+  ui->rightMissedCount->display(0);
 }
 
 void MainWindow::showScoreboardSummary() {
@@ -80,12 +101,7 @@ void MainWindow::showScoreboardSummary() {
 }
 
 void MainWindow::startSingleScreenGame() {
-  ui->leftNameEdit->setReadOnly(true);
-  ui->rightNameEdit->setReadOnly(true);
-  ui->leftScoreCount->display(0);
-  ui->leftMissedCount->display(0);
-  ui->rightScoredCount->display(0);
-  ui->rightMissedCount->display(0);
+  uiToGameMode();
   auto game = std::shared_ptr<Battleship::AbstractBattleshipGame>(
       new Battleship::BattleshipGame(
           {{ui->leftNameEdit->text().toStdString()},
@@ -99,9 +115,33 @@ void MainWindow::startSingleScreenGame() {
       ui->rightField, &FieldWidget::click,
       createClickHandler(game, 1,
                          {ui->rightNameEdit, ui->leftNameEdit, ui->rightField,
-                          ui->leftScoreCount, ui->leftMissedCount}));
+                          ui->leftScoredCount, ui->leftMissedCount}));
 }
 
-void MainWindow::hostGame() {}
+void MainWindow::hostGame() {
+  auto dialog = new HostGameDialog(this);
+  connect(dialog, &HostGameDialog::finished, dialog,
+          &HostGameDialog::deleteLater);
+  connect(dialog, &HostGameDialog::reportInput, this,
+          &MainWindow::startHostedGame);
+  dialog->show();
+}
+
+void MainWindow::startHostedGame(unsigned short port, QString playerName,
+                                 QString opponentName) {
+  uiToGameMode();
+  ui->leftNameEdit->setText(playerName);
+  ui->rightNameEdit->setText(opponentName);
+  auto game = Battleship::ServerWrapper::wrap(
+      std::unique_ptr<Battleship::BattleshipGame>(
+          new Battleship::BattleshipGame(
+              {{playerName.toStdString()}, {opponentName.toStdString()}})),
+      port);
+  connect(
+      ui->leftField, &FieldWidget::click,
+      createClickHandler(std::move(game), 0,
+                         {ui->leftNameEdit, ui->rightNameEdit, ui->leftField,
+                          ui->rightScoredCount, ui->rightMissedCount}));
+}
 
 void MainWindow::connectToGame() {}

@@ -16,12 +16,18 @@ add_executable(battleship
                 windows/scoreboardwindow.cpp
                 windows/scoreboardwindow.h
                 windows/scoreboardwindow.ui
+                windows/hostgamedialog.cpp
+                windows/hostgamedialog.h
+                windows/hostgamedialog.ui
+                network/server_wrapper.h
+                network/server_wrapper.cpp
                 db/database.h
                 db/database.cpp)
 target_link_libraries(battleship
         Qt::Core
         Qt::Gui
         Qt::Widgets
+        Qt::Network
         Qt::Sql
         rpc
 )

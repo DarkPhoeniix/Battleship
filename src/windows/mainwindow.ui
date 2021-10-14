@@ -63,7 +63,7 @@
             </property>
             <layout class="QGridLayout" name="gridLayout_5">
              <item row="0" column="0">
-              <widget class="QLCDNumber" name="leftScoreCount"/>
+              <widget class="QLCDNumber" name="leftScoredCount"/>
              </item>
             </layout>
            </widget>
@@ -151,6 +151,7 @@
     <addaction name="actionLocal"/>
     <addaction name="actionHost"/>
     <addaction name="actionConnect"/>
+    <addaction name="actionWith_computer"/>
    </widget>
    <widget class="QMenu" name="menuScoreboard">
     <property name="title">
@@ -180,6 +181,11 @@
   <action name="actionConnect">
    <property name="text">
     <string>Connect to game</string>
+   </property>
+  </action>
+  <action name="actionWith_computer">
+   <property name="text">
+    <string>With computer</string>
    </property>
   </action>
  </widget>

@@ -10,6 +10,7 @@ find_package(Qt6 COMPONENTS
 		Core
 		Gui
 		Widgets
+                Network
 		Sql
 		Test
 		REQUIRED)
