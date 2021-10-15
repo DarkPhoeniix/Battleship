@@ -27,6 +27,7 @@ class MainWindow : public QMainWindow {
 public:
   explicit MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
+  static constexpr int RestartCode = 101;
 
 private:
   Ui::MainWindow *ui;

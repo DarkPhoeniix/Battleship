@@ -30,6 +30,8 @@ void showWinner(const QString &winner) {
   box->setWindowTitle("Game Over");
   box->setText(winner + " won");
   QObject::connect(box, &QMessageBox::finished, box, &QMessageBox::deleteLater);
+  QObject::connect(box, &QMessageBox::finished, box,
+                   []() { qApp->exit(MainWindow::RestartCode); });
   box->show();
 };
 
@@ -103,6 +105,10 @@ void MainWindow::uiToGameMode() {
   ui->leftMissedCount->display(0);
   ui->rightScoredCount->display(0);
   ui->rightMissedCount->display(0);
+  ui->actionLocal->setDisabled(true);
+  ui->actionConnect->setDisabled(true);
+  ui->actionHost->setDisabled(true);
+  ui->actionAI->setDisabled(true);
 }
 
 void MainWindow::showScoreboardSummary() {
