@@ -1,4 +1,5 @@
 
+#include <QDebug>
 #include "AI.h"
 
 
@@ -136,6 +137,7 @@ namespace Battleship {
     }
 
     Coordinate AI::_generateRandomAttack() {
+        qDebug().verbosity(QDebug::MaximumVerbosity) << "AI generates turn in mode: random";
         Coordinate attackCoordinate;
 
         int displacementFactor = rand() % (_availableCoords.size() - 1);
@@ -145,7 +147,8 @@ namespace Battleship {
     }
 
     Coordinate AI::_generateDestroyingAttack() {
-        std::vector<Coordinate>::iterator attackCoordinate;
+        qDebug().verbosity(QDebug::MaximumVerbosity) << "AI generates turn in mode: hunt";
+        std::vector<Coordinate>::iterator attackCoordinate = _availableCoords.end();
 
         auto searcher = [&container = _availableCoords](Coordinate coordinate)
         {
@@ -164,9 +167,9 @@ namespace Battleship {
                                        _prevShots.end(),
                                        isHitShip);
 
-        while (true) {
+        while (attackCoordinate == _availableCoords.end()) {
             std::vector<uint8_t> availableDirection = { 1,2,3,4 };
-            while (!availableDirection.empty()) {
+            while (!availableDirection.empty() && attackCoordinate == _availableCoords.end()) {
                 uint8_t randomizer = rand() % availableDirection.size();
 
                 switch (availableDirection[randomizer]) {
@@ -189,11 +192,11 @@ namespace Battleship {
                 default:
                     break;
                 }
-
                 availableDirection.erase(std::find(availableDirection.begin(),
                                                    availableDirection.end(),
                                                    availableDirection[randomizer]));
             }
+            lastHitIter = std::find_if(std::next(lastHitIter),_prevShots.end(),isHitShip);
         }
         return *attackCoordinate;
     }
@@ -251,16 +254,9 @@ namespace Battleship {
 
 
 
-    Coordinate AI::generateAttack(TileState prevTileStatus)
+    void AI::approveAttack(Coordinate coordinate, TileState prevTileStatus)
     {
-        auto coord = _availableCoords.begin();
-        if (!_prevShots.empty()) {
-            _prevShots.rbegin()->second |= (prevTileStatus &
-                                            (TileState::WasShot |
-                                             TileState::ShipAfloat));
-        }
-
-        if (_checkIsSearchingPhase(prevTileStatus)) {
+        if(_isSearchingPhase) {
             for (auto& item : _prevShots) {
                 if ((item.second) == (TileState::ShipAfloat | TileState::WasShot)) {
                     item.second |= TileState::ShipSunk;
@@ -268,6 +264,22 @@ namespace Battleship {
                     _removeAdjacentCoordinates(_availableCoords, item.first);
                 }
             }
+        }
+        _prevShots.emplace_back(coordinate, TileState::WasShot);
+        _availableCoords.erase(std::find(_availableCoords.begin(), _availableCoords.end(), coordinate));
+    }
+
+    Coordinate AI::generateAttack(TileState prevTileStatus)
+    {
+        auto coord = _availableCoords.begin();
+
+        if (!_prevShots.empty()) {
+            _prevShots.rbegin()->second |= (prevTileStatus &
+                                            (TileState::WasShot |
+                                             TileState::ShipAfloat));
+        }
+
+        if (_checkIsSearchingPhase(prevTileStatus)) {
             coord = std::find(_availableCoords.begin(),
                               _availableCoords.end(),
                               _generateRandomAttack());
@@ -278,9 +290,7 @@ namespace Battleship {
                               _generateDestroyingAttack());
         }
 
-        _prevShots.emplace_back(*coord, TileState::WasShot);
         auto toRet = *coord;
-        _availableCoords.erase(coord);
         return toRet;
     }
 

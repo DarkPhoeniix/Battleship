@@ -69,6 +69,7 @@ std::function<void(int, int)> MainWindow::createClickHandler(
     } else {
       auto turn = game->registerTurn(x, y, enemyId);
       if (turn == Battleship::TurnStatus::Ok) {
+          qDebug().verbosity(QDebug::MaximumVerbosity) << "Player made a move: " << x << y;
         auto tile = game->getTileState(x, y, playerId);
         if (static_cast<bool>(tile & Battleship::TileState::ShipSunk)) {
           ui.field->addFieldCross(x, y, Qt::blue);
@@ -184,10 +185,12 @@ void MainWindow::startGameWithAI() {
             while (true) {
               auto [x, y] = ai.generateAttack(prev);
               auto turn = game->registerTurn(x, y, 1);
+                      qDebug().verbosity(QDebug::MaximumVerbosity)
+                          << "AI made a move:" << x << y;
               if (turn == Battleship::TurnStatus::Ok) {
-                qDebug().verbosity(QDebug::MaximumVerbosity)
-                    << "AI made a move:" << x << y;
+                ai.approveAttack(Battleship::Coordinate(x, y), prev);
                 auto tile = game->getTileState(x, y, 0);
+                prev = tile;
                 if (static_cast<bool>(tile & Battleship::TileState::ShipSunk)) {
                   field->addFieldCross(x, y, Qt::blue);
                 } else if (static_cast<bool>(
@@ -198,10 +201,7 @@ void MainWindow::startGameWithAI() {
                   field->addFieldDot(x, y, Qt::black);
                   break;
                 }
-                // ISSUE: AI probably loops if given correct data about previous
-                // tile
-                // TODO: fix infinite loop in AI and uncomment the line below
-                // prev = tile;
+
               } else {
                 qDebug().verbosity(QDebug::MaximumVerbosity)
                     << "Wrong turn status in AI:" << static_cast<int>(turn);

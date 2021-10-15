@@ -34,6 +34,7 @@ namespace Battleship {
         AI& operator=(const AI& copy);
         AI& operator=(AI&& obj) noexcept;
 
+        void approveAttack(Coordinate coordinate, TileState prevTileStatus);
         Coordinate generateAttack(TileState prevTileStatus = TileState::Empty);
         Battleship::Map generateMap();
     };
