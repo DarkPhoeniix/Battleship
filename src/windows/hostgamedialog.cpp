@@ -1,4 +1,5 @@
 #include "hostgamedialog.h"
+#include "network/utils.h"
 #include "ui_hostgamedialog.h"
 #include <QRandomGenerator>
 #include <QtNetwork/QNetworkInterface>
@@ -12,16 +13,6 @@ HostGameDialog::HostGameDialog(QWidget *parent)
 }
 
 HostGameDialog::~HostGameDialog() { delete ui; }
-
-unsigned short getPort() {
-  try {
-    QTcpServer srv;
-    srv.listen();
-    return srv.serverPort();
-  } catch (...) {
-    return 0;
-  }
-}
 
 bool HostGameDialog::fillBlanks() {
   auto port = getPort();

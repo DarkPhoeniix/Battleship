@@ -20,6 +20,11 @@ add_executable(battleship
                 windows/hostgamedialog.cpp
                 windows/hostgamedialog.h
                 windows/hostgamedialog.ui
+                windows/connecttogamedialog.cpp
+                windows/connecttogamedialog.h
+                windows/connecttogamedialog.ui
+                network/utils.h
+                network/utils.cpp
                 network/server_wrapper.h
                 network/server_wrapper.cpp
                 db/database.h

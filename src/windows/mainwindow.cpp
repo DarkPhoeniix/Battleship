@@ -4,6 +4,7 @@
 #include "game/battleship/battleshipgame.h"
 #include "network/server_wrapper.h"
 #include "ui_mainwindow.h"
+#include "windows/connecttogamedialog.h"
 #include "windows/hostgamedialog.h"
 #include "windows/scoreboardwindow.h"
 #include <QDebug>
@@ -71,7 +72,8 @@ std::function<void(int, int)> MainWindow::createClickHandler(
     } else {
       auto turn = game->registerTurn(x, y, enemyId);
       if (turn == Battleship::TurnStatus::Ok) {
-          qDebug().verbosity(QDebug::MaximumVerbosity) << "Player made a move: " << x << y;
+        qDebug().verbosity(QDebug::MaximumVerbosity)
+            << "Player made a move: " << x << y;
         auto tile = game->getTileState(x, y, playerId);
         if (static_cast<bool>(tile & Battleship::TileState::ShipSunk)) {
           ui.field->addFieldCross(x, y, Qt::blue);
@@ -149,20 +151,24 @@ void MainWindow::startHostedGame(unsigned short port, QString playerName,
   uiToGameMode();
   ui->leftNameEdit->setText(playerName);
   ui->rightNameEdit->setText(opponentName);
-  auto game = Battleship::ServerWrapper::wrap(
-      std::unique_ptr<Battleship::BattleshipGame>(
-          new Battleship::BattleshipGame(
-              {Battleship::Player{playerName.toStdString()},
-               Battleship::Player{opponentName.toStdString()}})),
-      port);
-  connect(
-      ui->leftField, &FieldWidget::click,
-      createClickHandler(std::move(game), 0,
-                         {ui->leftNameEdit, ui->rightNameEdit, ui->leftField,
-                          ui->rightScoredCount, ui->rightMissedCount}));
 }
 
-void MainWindow::connectToGame() {}
+void MainWindow::connectToGame() {
+  auto dialog = new ConnectToGameDialog(this);
+  connect(dialog, &ConnectToGameDialog::finished, dialog,
+          &ConnectToGameDialog::deleteLater);
+  connect(dialog, &ConnectToGameDialog::reportInput, this,
+          &MainWindow::startGameAsClient);
+  dialog->show();
+}
+
+void MainWindow::startGameAsClient(QString playerName, QString opponentName,
+                                   QString clientIp, QString hostIp,
+                                   unsigned short hostPort) {
+  uiToGameMode();
+  ui->leftNameEdit->setText(playerName);
+  ui->rightNameEdit->setText(opponentName);
+}
 
 void MainWindow::startGameWithAI() {
   uiToGameMode();
@@ -191,8 +197,8 @@ void MainWindow::startGameWithAI() {
             while (true) {
               auto [x, y] = ai.generateAttack(prev);
               auto turn = game->registerTurn(x, y, 1);
-                      qDebug().verbosity(QDebug::MaximumVerbosity)
-                          << "AI made a move:" << x << y;
+              qDebug().verbosity(QDebug::MaximumVerbosity)
+                  << "AI made a move:" << x << y;
               if (turn == Battleship::TurnStatus::Ok) {
                 ai.approveAttack(Battleship::Coordinate(x, y), prev);
                 auto tile = game->getTileState(x, y, 0);

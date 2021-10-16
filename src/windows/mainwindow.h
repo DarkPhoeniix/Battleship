@@ -43,6 +43,9 @@ private slots:
   void startHostedGame(unsigned short port, QString playerName,
                        QString opponentName);
   void connectToGame();
+  void startGameAsClient(QString playerName, QString opponentName,
+                         QString clientIp, QString hostIp,
+                         unsigned short hostPort);
   void startGameWithAI();
 };
 
