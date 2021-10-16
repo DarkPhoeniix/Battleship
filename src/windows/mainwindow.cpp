@@ -28,7 +28,6 @@ MainWindow::~MainWindow() { delete ui; }
 
 void showWinner(const QString &winner) {
   auto box = new QMessageBox();
-  box->setWindowTitle("Game Over");
   box->setText(winner + " won");
   QObject::connect(box, &QMessageBox::finished, box, &QMessageBox::deleteLater);
   QObject::connect(box, &QMessageBox::finished, box,
@@ -91,8 +90,8 @@ std::function<void(int, int)> MainWindow::createClickHandler(
           showWinner(ui.enemyName->text());
         } else if (game->finished(enemyId) ==
                    Battleship::TerminationStatus::PlayerLost) {
-          showWinner(ui.name->text());
-        }
+         showWinner(ui.name->text());
+       }
       } else
         qDebug().verbosity(QDebug::MaximumVerbosity)
             << "Wrong turn status: " << static_cast<int>(turn);
@@ -192,7 +191,7 @@ void MainWindow::startGameWithAI() {
                           ui->leftScoredCount, ui->leftMissedCount},
                          true));
   connect(ui->rightField, &FieldWidget::click,
-          [game, field = ui->leftField, ai,
+          [game, name = ui->rightNameEdit, field = ui->leftField, ai,
            prev = Battleship::TileState::Empty]() mutable {
             while (true) {
               auto [x, y] = ai.generateAttack(prev);
@@ -213,12 +212,16 @@ void MainWindow::startGameWithAI() {
                   field->addFieldDot(x, y, Qt::black);
                   break;
                 }
-
+                if (game->finished(0) ==
+                    Battleship::TerminationStatus::PlayerLost) {
+                  showWinner(name->text());
+                }
               } else {
                 qDebug().verbosity(QDebug::MaximumVerbosity)
                     << "Wrong turn status in AI:" << static_cast<int>(turn);
                 break;
               }
+
             }
           });
 }
