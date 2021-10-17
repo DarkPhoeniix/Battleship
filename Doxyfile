@@ -1,0 +1,11 @@
+DOXYFILE_ENCODING      = UTF-8
+PROJECT_NAME           = Battleship
+PROJECT_BRIEF          = "Battleship board game"
+OUTPUT_DIRECTORY       = "docs"
+FULL_PATH_NAMES        = NO
+CASE_SENSE_NAMES       = NO
+INPUT                  = "src"
+INPUT_ENCODING         = UTF-8
+FILE_PATTERNS          = *.h
+RECURSIVE              = YES
+ENABLE_PREPROCESSING   = NO

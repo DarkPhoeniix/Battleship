@@ -1,0 +1,22 @@
+name: Doxygen
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  job:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: mattnotmitt/doxygen-action@v1
+      with:
+        working-directory: '.'
+        doxyfile-path: './Doxyfile'
+    - uses: EndBug/add-and-commit@v4
+      with:
+        author_name: Doxygen Robot
+        author_email: robot@example.com
+        message: 'docs: generate pages'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
