@@ -324,6 +324,7 @@ void MainWindow::startGameWithAI() {
                       enemyUi.name->text(), enemyUi.hit->value(),
                       enemyUi.miss->value());
                   emit showWinner(enemyUi.name->text());
+                  break;
                 }
               } else {
                 qDebug().verbosity(QDebug::MinimumVerbosity)
