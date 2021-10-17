@@ -157,6 +157,7 @@ void MainWindow::startHostedGame(QString clientIp, QString playerName,
   ui->leftNameEdit->setText(playerName);
   ui->rightNameEdit->setText(opponentName);
   auto server = new rpc::server(5050);
+  connect(this, &MainWindow::destroyed, [server](){ delete server; });
   server->bind("click", [field = ui->rightField](int x, int y) {
     emit field->click(x, y);
   });
@@ -241,6 +242,7 @@ void MainWindow::startGameAsClient(QString hostIp) {
             rpc::client(ip, Battleship::ServerPort).call("click", x, y);
           });
   auto server = new rpc::server(5055);
+  connect(this, &MainWindow::destroyed, [server](){ delete server; });
   server->bind("rightRemoveFieldItems", [field = ui->rightField](int x, int y) {
     emit field->removeFieldItemsSignal(x, y);
   });
