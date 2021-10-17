@@ -10,8 +10,11 @@ find_package(Qt6 COMPONENTS
 		Core
 		Gui
 		Widgets
-                Sql
-                Test
+                Network
+		Sql
+		Test
 		REQUIRED)
 
+add_subdirectory(3rdparty)
+enable_testing()
 add_subdirectory(src)

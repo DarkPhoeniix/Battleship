@@ -1,32 +1,43 @@
+include_directories(.)
 add_executable(battleship
                 main.cpp
                 game/generic_interfaces.h
+                game/network.h
                 game/battleship/abstract_game.h
                 game/battleship/enumerations.h
+                game/battleship/battleshipgame.cpp
+                game/battleship/map.cpp
+                game/battleship/ship.cpp
+                game/battleship/player.cpp
+                game/battleship/AI/AI.cpp
                 widgets/fieldwidget.h
                 widgets/fieldwidget.cpp
                 windows/mainwindow.h
                 windows/mainwindow.cpp
                 windows/mainwindow.ui
+                windows/scoreboardwindow.cpp
+                windows/scoreboardwindow.h
+                windows/scoreboardwindow.ui
+                windows/hostgamedialog.cpp
+                windows/hostgamedialog.h
+                windows/hostgamedialog.ui
+                windows/connecttogamedialog.cpp
+                windows/connecttogamedialog.h
+                windows/connecttogamedialog.ui
                 db/database.h
                 db/database.cpp)
-include_directories(.)
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    set_property(TARGET battleship PROPERTY WIN32_EXECUTABLE true)
+endif()
 target_link_libraries(battleship
-		Qt::Core
-		Qt::Gui
-		Qt::Widgets
-                Qt::Sql
+        Qt::Core
+        Qt::Gui
+        Qt::Widgets
+        Qt::Network
+        Qt::Sql
+        rpc
 )
-
-add_executable(database_test
-                db/database.h
-                db/database.cpp
-                db/database_test.cpp)
-target_link_libraries(database_test
-                Qt::Core
-                Qt::Gui
-                Qt::Widgets
-                Qt::Sql
-                Qt::Test
-)
-add_test(NAME DatabaseTest COMMAND database_test)
+add_subdirectory(db)
+add_subdirectory(game)
+add_subdirectory(widgets)
+add_subdirectory(windows)

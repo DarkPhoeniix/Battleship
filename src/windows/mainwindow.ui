@@ -31,7 +31,7 @@
        <item row="0" column="1">
         <widget class="QLineEdit" name="leftNameEdit">
          <property name="readOnly">
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -63,7 +63,7 @@
             </property>
             <layout class="QGridLayout" name="gridLayout_5">
              <item row="0" column="0">
-              <widget class="QLCDNumber" name="leftScoreCount"/>
+              <widget class="QLCDNumber" name="leftScoredCount"/>
              </item>
             </layout>
            </widget>
@@ -90,7 +90,7 @@
        <item row="0" column="1">
         <widget class="QLineEdit" name="rightNameEdit">
          <property name="readOnly">
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -144,19 +144,50 @@
      <height>21</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuPlay">
+    <property name="title">
+     <string>Play</string>
+    </property>
+    <addaction name="actionLocal"/>
+    <addaction name="actionHost"/>
+    <addaction name="actionConnect"/>
+    <addaction name="actionAI"/>
+   </widget>
+   <widget class="QMenu" name="menuScoreboard">
+    <property name="title">
+     <string>Scoreboard</string>
+    </property>
+    <addaction name="actionSummary"/>
+   </widget>
+   <addaction name="menuPlay"/>
+   <addaction name="menuScoreboard"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <widget class="QToolBar" name="toolBar">
-   <property name="windowTitle">
-    <string>toolBar</string>
+  <action name="actionLocal">
+   <property name="text">
+    <string>Single screen</string>
    </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-  </widget>
+  </action>
+  <action name="actionHost">
+   <property name="text">
+    <string>Host a game</string>
+   </property>
+  </action>
+  <action name="actionSummary">
+   <property name="text">
+    <string>Summary</string>
+   </property>
+  </action>
+  <action name="actionConnect">
+   <property name="text">
+    <string>Connect to game</string>
+   </property>
+  </action>
+  <action name="actionAI">
+   <property name="text">
+    <string>With computer</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -166,5 +197,93 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>actionSummary</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>showScoreboardSummary()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionLocal</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>startSingleScreenGame()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionHost</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>hostGame()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionConnect</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>connectToGame()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionAI</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>startGameWithAI()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>showScoreboardSummary()</slot>
+  <slot>startSingleScreenGame()</slot>
+  <slot>hostGame()</slot>
+  <slot>connectToGame()</slot>
+  <slot>startGameWithAI()</slot>
+ </slots>
 </ui>
