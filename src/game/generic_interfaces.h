@@ -1,6 +1,6 @@
 #pragma once
-#include <utility>
 #include <cstdint>
+#include <utility>
 namespace Interfaces {
 template <typename TileState> struct IMapScanner {
   virtual TileState getTileState(uint8_t x, uint8_t y,

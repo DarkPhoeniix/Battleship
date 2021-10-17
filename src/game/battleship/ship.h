@@ -8,27 +8,26 @@
 #include "coordinate.h"
 
 namespace Battleship {
-    class Ship
-    {
-    private:
-        std::vector<Coordinate> _coordinates;
-        bool _isDestroyed;
+class Ship {
+private:
+  std::vector<Coordinate> _coordinates;
+  bool _isDestroyed;
 
-    public:
-        Ship(const std::vector<Coordinate>& coordinates, bool isDestroyed = false);
-        Ship(const Ship& copy);
-        Ship(Ship&& obj) noexcept;
-        ~Ship();
+public:
+  Ship(const std::vector<Coordinate> &coordinates, bool isDestroyed = false);
+  Ship(const Ship &copy);
+  Ship(Ship &&obj) noexcept;
+  ~Ship();
 
-        Ship& operator=(const Ship& copy);
-        Ship& operator=(Ship&& obj) noexcept;
+  Ship &operator=(const Ship &copy);
+  Ship &operator=(Ship &&obj) noexcept;
 
-        void setIsDestroyed(bool isDestroyed);
-        std::vector<Coordinate> getCoordinates() const;
-        bool isDestroyed() const;
+  void setIsDestroyed(bool isDestroyed);
+  std::vector<Coordinate> getCoordinates() const;
+  bool isDestroyed() const;
 
-        friend bool operator==(const Ship& lhs, const Ship& rhs);
-    };
+  friend bool operator==(const Ship &lhs, const Ship &rhs);
+};
 } // namespace Battleship
 
 #endif // __SHIP_H_INCLUDED
