@@ -297,7 +297,7 @@ void MainWindow::startGameWithAI() {
             while (true) {
               auto attackCoordinate = ai.generateAttack(prev);
               if (attackCoordinate == Battleship::ErrCoord) {
-                  break;
+                break;
               }
               auto [x, y] = attackCoordinate;
               auto turn = game->registerTurn(x, y, 1);
