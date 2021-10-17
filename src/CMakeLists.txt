@@ -2,6 +2,7 @@ include_directories(.)
 add_executable(battleship
                 main.cpp
                 game/generic_interfaces.h
+                game/network.h
                 game/battleship/abstract_game.h
                 game/battleship/enumerations.h
                 game/battleship/battleshipgame.cpp
@@ -23,12 +24,11 @@ add_executable(battleship
                 windows/connecttogamedialog.cpp
                 windows/connecttogamedialog.h
                 windows/connecttogamedialog.ui
-                network/utils.h
-                network/utils.cpp
-                network/server_wrapper.h
-                network/server_wrapper.cpp
                 db/database.h
                 db/database.cpp)
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    set_property(TARGET battleship PROPERTY WIN32_EXECUTABLE true)
+endif()
 target_link_libraries(battleship
         Qt::Core
         Qt::Gui
@@ -39,6 +39,5 @@ target_link_libraries(battleship
 )
 add_subdirectory(db)
 add_subdirectory(game)
-add_subdirectory(network)
 add_subdirectory(widgets)
 add_subdirectory(windows)

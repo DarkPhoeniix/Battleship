@@ -2,7 +2,9 @@
 #include "db/database.h"
 #include "game/battleship/AI/AI.h"
 #include "game/battleship/battleshipgame.h"
-#include "network/server_wrapper.h"
+#include "game/network.h"
+#include "rpc/client.h"
+#include "rpc/server.h"
 #include "ui_mainwindow.h"
 #include "windows/connecttogamedialog.h"
 #include "windows/hostgamedialog.h"
@@ -37,8 +39,8 @@ bool validateShipsInput(const QSet<QPair<int, int>> &ships) {
 
 std::function<void(int, int)> MainWindow::createClickHandler(
     std::shared_ptr<Battleship::AbstractBattleshipGame> game, int playerId,
-    PlayerUI ui, bool skipMapping) {
-  return [this, game, playerId, enemyId = std::abs(playerId - 1), ui,
+    PlayerUI ui, PlayerUI enemyUi, bool skipMapping) {
+  return [this, game, playerId, enemyId = std::abs(playerId - 1), ui, enemyUi,
           ships = QSet<QPair<int, int>>(),
           isMappingPhase = !skipMapping](int x, int y) mutable {
     if (isMappingPhase) {
@@ -79,9 +81,19 @@ std::function<void(int, int)> MainWindow::createClickHandler(
         }
         if (game->finished(playerId) ==
             Battleship::TerminationStatus::PlayerLost) {
-          emit showWinner(ui.enemyName->text());
+          Battleship::Database::Instance().addLoss(
+              ui.name->text(), ui.hit->value(), ui.miss->value());
+          Battleship::Database::Instance().addVictory(enemyUi.name->text(),
+                                                      enemyUi.hit->value(),
+                                                      enemyUi.miss->value());
+          emit showWinner(enemyUi.name->text());
         } else if (game->finished(enemyId) ==
                    Battleship::TerminationStatus::PlayerLost) {
+          Battleship::Database::Instance().addVictory(
+              ui.name->text(), ui.hit->value(), ui.miss->value());
+          Battleship::Database::Instance().addLoss(enemyUi.name->text(),
+                                                   enemyUi.hit->value(),
+                                                   enemyUi.miss->value());
           emit showWinner(ui.name->text());
         }
       } else
@@ -116,16 +128,18 @@ void MainWindow::startSingleScreenGame() {
       new Battleship::BattleshipGame(
           {Battleship::Player{ui->leftNameEdit->text().toStdString()},
            Battleship::Player{ui->rightNameEdit->text().toStdString()}}));
-  connect(
-      ui->leftField, &FieldWidget::click,
-      createClickHandler(game, 0,
-                         {ui->leftNameEdit, ui->rightNameEdit, ui->leftField,
-                          ui->leftScoredCount, ui->leftMissedCount}));
-  connect(
-      ui->rightField, &FieldWidget::click,
-      createClickHandler(game, 1,
-                         {ui->rightNameEdit, ui->leftNameEdit, ui->rightField,
-                          ui->rightScoredCount, ui->rightMissedCount}));
+  connect(ui->leftField, &FieldWidget::click,
+          createClickHandler(game, 0,
+                             {ui->leftNameEdit, ui->leftField,
+                              ui->leftScoredCount, ui->leftMissedCount},
+                             {ui->rightNameEdit, ui->rightField,
+                              ui->rightScoredCount, ui->rightMissedCount}));
+  connect(ui->rightField, &FieldWidget::click,
+          createClickHandler(game, 1,
+                             {ui->rightNameEdit, ui->rightField,
+                              ui->rightScoredCount, ui->rightMissedCount},
+                             {ui->leftNameEdit, ui->leftField,
+                              ui->leftScoredCount, ui->leftMissedCount}));
 }
 
 void MainWindow::hostGame() {
@@ -143,52 +157,61 @@ void MainWindow::startHostedGame(QString clientIp, QString playerName,
   ui->leftNameEdit->setText(playerName);
   ui->rightNameEdit->setText(opponentName);
   auto server = new rpc::server(5050);
-  server->bind("rightClick", [field = ui->rightField](int x, int y) {
+  server->bind("click", [field = ui->rightField](int x, int y) {
     emit field->click(x, y);
   });
   server->async_run(1);
   connect(ui->rightField, &FieldWidget::removeFieldItemsSignal,
           [ip = clientIp.toStdString()](int x, int y) {
-            rpc::client(ip, 5055).call("rightRemoveFieldItems", x, y);
+            rpc::client(ip, Battleship::ClientPort)
+                .call("rightRemoveFieldItems", x, y);
           });
   connect(ui->leftField, &FieldWidget::removeFieldItemsSignal,
           [ip = clientIp.toStdString()](int x, int y) {
-            rpc::client(ip, 5055).call("leftRemoveFieldItems", x, y);
+            rpc::client(ip, Battleship::ClientPort)
+                .call("leftRemoveFieldItems", x, y);
           });
   connect(ui->rightField, &FieldWidget::addFieldCrossSignal,
           [ip = clientIp.toStdString()](int x, int y, Qt::GlobalColor color) {
-            rpc::client(ip, 5055).call("rightAddFieldCross", x, y,
-                                       static_cast<int>(color));
+            rpc::client(ip, Battleship::ClientPort)
+                .call("rightAddFieldCross", x, y, static_cast<int>(color));
           });
   connect(ui->leftField, &FieldWidget::addFieldCrossSignal,
           [ip = clientIp.toStdString()](int x, int y, Qt::GlobalColor color) {
-            rpc::client(ip, 5055).call("leftAddFieldCross", x, y,
-                                       static_cast<int>(color));
+            rpc::client(ip, Battleship::ClientPort)
+                .call("leftAddFieldCross", x, y, static_cast<int>(color));
           });
   connect(ui->rightField, &FieldWidget::addFieldDotSignal,
           [ip = clientIp.toStdString()](int x, int y, Qt::GlobalColor color) {
-            rpc::client(ip, 5055).call("rightAddFieldDot", x, y,
-                                       static_cast<int>(color));
+            rpc::client(ip, Battleship::ClientPort)
+                .call("rightAddFieldDot", x, y, static_cast<int>(color));
           });
   connect(ui->leftField, &FieldWidget::addFieldDotSignal,
           [ip = clientIp.toStdString()](int x, int y, Qt::GlobalColor color) {
-            rpc::client(ip, 5055).call("leftAddFieldDot", x, y,
-                                       static_cast<int>(color));
+            rpc::client(ip, Battleship::ClientPort)
+                .call("leftAddFieldDot", x, y, static_cast<int>(color));
+          });
+  connect(this, &MainWindow::showWinner,
+          [ip = clientIp.toStdString()](QString name) {
+            rpc::client(ip, Battleship::ClientPort)
+                .call("showWinner", name.toStdString());
           });
   auto game = std::shared_ptr<Battleship::AbstractBattleshipGame>(
       new Battleship::BattleshipGame(
           {Battleship::Player{ui->leftNameEdit->text().toStdString()},
            Battleship::Player{ui->rightNameEdit->text().toStdString()}}));
-  connect(
-      ui->leftField, &FieldWidget::click,
-      createClickHandler(game, 0,
-                         {ui->leftNameEdit, ui->rightNameEdit, ui->leftField,
-                          ui->leftScoredCount, ui->leftMissedCount}));
-  connect(
-      ui->rightField, &FieldWidget::click,
-      createClickHandler(game, 1,
-                         {ui->rightNameEdit, ui->leftNameEdit, ui->rightField,
-                          ui->rightScoredCount, ui->rightMissedCount}));
+  connect(ui->leftField, &FieldWidget::click,
+          createClickHandler(game, 0,
+                             {ui->leftNameEdit, ui->leftField,
+                              ui->leftScoredCount, ui->leftMissedCount},
+                             {ui->rightNameEdit, ui->rightField,
+                              ui->rightScoredCount, ui->rightMissedCount}));
+  connect(ui->rightField, &FieldWidget::click,
+          createClickHandler(game, 1,
+                             {ui->rightNameEdit, ui->rightField,
+                              ui->rightScoredCount, ui->rightMissedCount},
+                             {ui->leftNameEdit, ui->leftField,
+                              ui->leftScoredCount, ui->leftMissedCount}));
   connect(ui->rightField, &FieldWidget::addFieldCrossSignal,
           [field = ui->rightField](int x, int y, Qt::GlobalColor color) {
             if (color == Qt::black)
@@ -209,11 +232,13 @@ void MainWindow::startGameAsClient(QString hostIp) {
   uiToGameMode();
   ui->rightNameLabel->hide();
   ui->rightNameEdit->hide();
+  ui->rightFooter->hide();
   ui->leftNameLabel->hide();
   ui->leftNameEdit->hide();
+  ui->leftFooter->hide();
   connect(ui->rightField, &FieldWidget::click,
           [ip = hostIp.toStdString()](int x, int y) {
-            rpc::client(ip, 5050).call("rightClick", x, y);
+            rpc::client(ip, Battleship::ServerPort).call("click", x, y);
           });
   auto server = new rpc::server(5055);
   server->bind("rightRemoveFieldItems", [field = ui->rightField](int x, int y) {
@@ -240,6 +265,9 @@ void MainWindow::startGameAsClient(QString hostIp) {
                                                           int color) {
     emit field->addFieldDotSignal(x, y, static_cast<Qt::GlobalColor>(color));
   });
+  server->bind("showWinner", [this](std::string name) {
+    emit showWinner(QString::fromStdString(name));
+  });
   server->async_run(1);
 }
 
@@ -253,14 +281,19 @@ void MainWindow::startGameWithAI() {
       new Battleship::BattleshipGame(
           {Battleship::Player{ui->leftNameEdit->text().toStdString()},
            Battleship::Player{ui->rightNameEdit->text().toStdString(), map}}));
-  connect(
-      ui->leftField, &FieldWidget::click,
-      createClickHandler(game, 0,
-                         {ui->leftNameEdit, ui->rightNameEdit, ui->leftField,
-                          ui->leftScoredCount, ui->leftMissedCount}));
+  connect(ui->leftField, &FieldWidget::click,
+          createClickHandler(game, 0,
+                             {ui->leftNameEdit, ui->leftField,
+                              ui->leftScoredCount, ui->leftMissedCount},
+                             {ui->rightNameEdit, ui->rightField,
+                              ui->rightScoredCount, ui->rightMissedCount}));
   connect(ui->leftField, &FieldWidget::addFieldDotSignal,
-          [this, game, name = ui->rightNameEdit, field = ui->rightField, ai,
-           prev = Battleship::TileState::Empty]() mutable {
+          [this, game,
+           ui = PlayerUI{ui->rightNameEdit, ui->rightField,
+                         ui->rightScoredCount, ui->rightMissedCount},
+           enemyUi = PlayerUI{ui->leftNameEdit, ui->leftField,
+                              ui->leftScoredCount, ui->leftMissedCount},
+           ai, prev = Battleship::TileState::Empty]() mutable {
             while (true) {
               auto [x, y] = ai.generateAttack(prev);
               auto turn = game->registerTurn(x, y, 1);
@@ -271,18 +304,26 @@ void MainWindow::startGameWithAI() {
                 ai.approveAttack(Battleship::Coordinate(x, y), tile);
                 prev = tile;
                 if (static_cast<bool>(tile & Battleship::TileState::ShipSunk)) {
-                  field->addFieldCross(x, y, Qt::blue);
+                  ui.field->addFieldCross(x, y, Qt::blue);
+                  ui.hit->display(ui.hit->value() + 1);
                 } else if (static_cast<bool>(
                                tile & Battleship::TileState::ShipAfloat)) {
-                  field->addFieldCross(x, y, Qt::red);
+                  ui.field->addFieldCross(x, y, Qt::red);
+                  ui.hit->display(ui.hit->value() + 1);
                 } else if (static_cast<bool>(tile &
                                              Battleship::TileState::WasShot)) {
-                  field->addFieldDot(x, y, Qt::black);
+                  ui.field->addFieldDot(x, y, Qt::black);
+                  ui.miss->display(ui.miss->value() + 1);
                   break;
                 }
-                if (game->finished(0) ==
+                if (game->finished(1) ==
                     Battleship::TerminationStatus::PlayerLost) {
-                  emit showWinner(name->text());
+                  Battleship::Database::Instance().addLoss(
+                      ui.name->text(), ui.hit->value(), ui.miss->value());
+                  Battleship::Database::Instance().addVictory(
+                      enemyUi.name->text(), enemyUi.hit->value(),
+                      enemyUi.miss->value());
+                  emit showWinner(enemyUi.name->text());
                 }
               } else {
                 qDebug().verbosity(QDebug::MinimumVerbosity)

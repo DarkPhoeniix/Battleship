@@ -17,7 +17,6 @@ class MainWindow;
 
 struct PlayerUI {
   QLineEdit *name;
-  QLineEdit *enemyName;
   FieldWidget *field;
   QLCDNumber *hit;
   QLCDNumber *miss;
@@ -36,7 +35,8 @@ private:
   std::unique_ptr<Battleship::AbstractBattleshipGame> _game;
   std::function<void(int, int)>
   createClickHandler(std::shared_ptr<Battleship::AbstractBattleshipGame> game,
-                     int playerId, PlayerUI w, bool skipMapping = false);
+                     int playerId, PlayerUI ui, PlayerUI enemyUI,
+                     bool skipMapping = false);
   void uiToGameMode();
 signals:
   void showWinner(const QString &winner);
