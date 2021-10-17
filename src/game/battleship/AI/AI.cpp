@@ -109,7 +109,7 @@ namespace Battleship {
             }
         };
 
-        eraser(Coordinate(coordinate.x, coordinate.y));
+//        eraser(Coordinate(coordinate.x, coordinate.y));
         eraser(Coordinate(coordinate.x + 1, coordinate.y));
         eraser(Coordinate(coordinate.x - 1, coordinate.y));
         eraser(Coordinate(coordinate.x, coordinate.y + 1));
@@ -120,27 +120,27 @@ namespace Battleship {
         eraser(Coordinate(coordinate.x - 1, coordinate.y - 1));
     }
 
-    bool AI::_checkIsSearchingPhase(TileState prevTileStatus) {
-        if (prevTileStatus == (TileState::Empty |
-            TileState::WasShot |
-            TileState::ShipAfloat)) {
-            _isSearchingPhase = false;
-        }
-        else if (prevTileStatus == (TileState::Empty |
-            TileState::WasShot |
-            TileState::ShipAfloat |
-            TileState::ShipSunk)) {
-            _isSearchingPhase = true;
+    bool AI::_checkIsHuntingPhase(TileState prevTileStatus) {
+        if (prevTileStatus == (TileState::WasShot |
+                               TileState::ShipAfloat |
+                               TileState::ShipSunk)) {
+            _isHuntingPhase = false;
+        } else if (prevTileStatus == (TileState::WasShot |
+                                      TileState::ShipAfloat)) {
+            _isHuntingPhase = true;
         }
 
-        return _isSearchingPhase;
+        return _isHuntingPhase;
     }
 
     Coordinate AI::_generateRandomAttack() {
         qDebug().verbosity(QDebug::MaximumVerbosity) << "AI generates turn in mode: random";
-        Coordinate attackCoordinate;
+        Coordinate attackCoordinate = Coordinate(255, 255);
+        int displacementFactor = 0;
 
-        int displacementFactor = rand() % (_availableCoords.size() - 1);
+        if (_availableCoords.size() > 1) {
+            displacementFactor = rand() % (_availableCoords.size() - 1);
+        }
         attackCoordinate = *(_availableCoords.begin() + displacementFactor);
 
         return attackCoordinate;
@@ -166,12 +166,10 @@ namespace Battleship {
             lastHitIter = std::find_if(_prevShots.begin(),
                                        _prevShots.end(),
                                        isHitShip);
-
         while (attackCoordinate == _availableCoords.end()) {
             std::vector<uint8_t> availableDirection = { 1,2,3,4 };
             while (!availableDirection.empty() && attackCoordinate == _availableCoords.end()) {
                 uint8_t randomizer = rand() % availableDirection.size();
-
                 switch (availableDirection[randomizer]) {
                 case 1:
                     attackCoordinate = searcher(Coordinate(lastHitIter->first.x + 1,
@@ -198,13 +196,14 @@ namespace Battleship {
             }
             lastHitIter = std::find_if(std::next(lastHitIter),_prevShots.end(),isHitShip);
         }
+
         return *attackCoordinate;
     }
 
 
 
     AI::AI()
-        : _isSearchingPhase(true)
+        : _isHuntingPhase(false)
     {
         for (uint8_t i = 0; i < Map::MAP_SIZE; ++i) {
             for (uint8_t j = 0; j < Map::MAP_SIZE; ++j) {
@@ -217,7 +216,7 @@ namespace Battleship {
         if (this != &copy) {
             _availableCoords = copy._availableCoords;
             _prevShots = copy._prevShots;
-            _isSearchingPhase = copy._isSearchingPhase;
+            _isHuntingPhase = copy._isHuntingPhase;
         }
     }
 
@@ -225,7 +224,7 @@ namespace Battleship {
         if (this != &obj) {
             _availableCoords = std::move(obj._availableCoords);
             _prevShots = std::move(obj._prevShots);
-            _isSearchingPhase = obj._isSearchingPhase;
+            _isHuntingPhase = obj._isHuntingPhase;
         }
     }
 
@@ -238,7 +237,7 @@ namespace Battleship {
         if (this != &copy) {
             _availableCoords = copy._availableCoords;
             _prevShots = copy._prevShots;
-            _isSearchingPhase = copy._isSearchingPhase;
+            _isHuntingPhase = copy._isHuntingPhase;
         }
         return *this;
     }
@@ -247,50 +246,59 @@ namespace Battleship {
         if (this != &obj) {
             _availableCoords = std::move(obj._availableCoords);
             _prevShots = std::move(obj._prevShots);
-            _isSearchingPhase = obj._isSearchingPhase;
+            _isHuntingPhase = obj._isHuntingPhase;
         }
         return *this;
     }
 
 
 
-    void AI::approveAttack(Coordinate coordinate, TileState prevTileStatus)
+    void AI::approveAttack(Coordinate coordinate, TileState tileStatus)
     {
-        if(_isSearchingPhase) {
-            for (auto& item : _prevShots) {
-                if ((item.second) == (TileState::ShipAfloat | TileState::WasShot)) {
-                    item.second |= TileState::ShipSunk;
+        _prevShots.emplace_back(coordinate, tileStatus);
 
+        if(!_checkIsHuntingPhase(tileStatus)) {
+            for (auto& item : _prevShots) {
+                if ((item.second & (TileState::ShipAfloat | TileState::WasShot)) == (TileState::ShipAfloat | TileState::WasShot)) {
+                    item.second |= TileState::ShipSunk;
                     _removeAdjacentCoordinates(_availableCoords, item.first);
                 }
             }
         }
-        _prevShots.emplace_back(coordinate, TileState::WasShot);
-        _availableCoords.erase(std::find(_availableCoords.begin(), _availableCoords.end(), coordinate));
+
+        auto toErase = std::find(_availableCoords.begin(), _availableCoords.end(), coordinate);
+        if (toErase != _availableCoords.end()) {
+            _availableCoords.erase(toErase);
+        }
     }
 
-    Coordinate AI::generateAttack(TileState prevTileStatus)
+    Coordinate AI::generateAttack(TileState prevTileStatus) noexcept
     {
         auto coord = _availableCoords.begin();
-
-        if (!_prevShots.empty()) {
-            _prevShots.rbegin()->second |= (prevTileStatus &
-                                            (TileState::WasShot |
-                                             TileState::ShipAfloat));
-        }
-
-        if (_checkIsSearchingPhase(prevTileStatus)) {
-            coord = std::find(_availableCoords.begin(),
-                              _availableCoords.end(),
-                              _generateRandomAttack());
-        }
-        else {
-            coord = std::find(_availableCoords.begin(),
-                              _availableCoords.end(),
-                              _generateDestroyingAttack());
-        }
-
         auto toRet = *coord;
+        try {
+            if (!_prevShots.empty()) {
+                _prevShots.rbegin()->second |= (prevTileStatus &
+                                                (TileState::WasShot |
+                                                 TileState::ShipAfloat));
+            }
+
+            if (!_isHuntingPhase) {
+                coord = std::find(_availableCoords.begin(),
+                                  _availableCoords.end(),
+                                  _generateRandomAttack());
+            }
+            else {
+                coord = std::find(_availableCoords.begin(),
+                                  _availableCoords.end(),
+                                  _generateDestroyingAttack());
+            }
+
+            toRet = *coord;
+        } catch(...) {
+            toRet = ErrCoord;
+        }
+
         return toRet;
     }
 

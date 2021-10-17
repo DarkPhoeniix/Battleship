@@ -267,8 +267,8 @@ void MainWindow::startGameWithAI() {
               qDebug().verbosity(QDebug::MaximumVerbosity)
                   << "AI made a move:" << x << y;
               if (turn == Battleship::TurnStatus::Ok) {
-                ai.approveAttack(Battleship::Coordinate(x, y), prev);
                 auto tile = game->getTileState(x, y, 0);
+                ai.approveAttack(Battleship::Coordinate(x, y), tile);
                 prev = tile;
                 if (static_cast<bool>(tile & Battleship::TileState::ShipSunk)) {
                   field->addFieldCross(x, y, Qt::blue);
@@ -285,7 +285,7 @@ void MainWindow::startGameWithAI() {
                   emit showWinner(name->text());
                 }
               } else {
-                qDebug().verbosity(QDebug::MaximumVerbosity)
+                qDebug().verbosity(QDebug::MinimumVerbosity)
                     << "Wrong turn status in AI:" << static_cast<int>(turn);
                 break;
               }

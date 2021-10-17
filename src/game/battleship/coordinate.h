@@ -1,5 +1,6 @@
-#ifndef COORDINATE_H
-#define COORDINATE_H
+
+#ifndef __COORDINATE_H_INCLUDED
+#define __COORDINATE_H_INCLUDED
 
 #include <cstdint>
 
@@ -8,9 +9,10 @@ namespace Battleship {
         uint8_t x;
         uint8_t y;
 
-        Coordinate() : x(0), y(0)
+        constexpr Coordinate()
+            : x(0), y(0)
         {   }
-        Coordinate(uint8_t x, uint8_t y)
+        constexpr Coordinate(uint8_t x, uint8_t y)
             : x(x), y(y)
         {   }
         Coordinate(const Coordinate& copy)
@@ -35,4 +37,4 @@ namespace Battleship {
     };
 } // namespace Battleship
 
-#endif // COORDINATE_H
+#endif // __COORDINATE_H_INCLUDED
