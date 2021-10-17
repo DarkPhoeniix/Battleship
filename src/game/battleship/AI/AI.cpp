@@ -7,7 +7,6 @@ std::vector<Coordinate> AI::_placeShip(std::vector<Coordinate> &freeCoordinates,
                                        uint8_t shipSize) const {
   Coordinate generatedCoord(0, 0);
   std::vector<Coordinate> badCoords;
-  badCoords.reserve(10);
   bool flag = true;
 
   generatedCoord = freeCoordinates[rand() % (freeCoordinates.size() - 1)];
