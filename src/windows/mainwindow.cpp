@@ -295,7 +295,11 @@ void MainWindow::startGameWithAI() {
                               ui->leftScoredCount, ui->leftMissedCount},
            ai, prev = Battleship::TileState::Empty]() mutable {
             while (true) {
-              auto [x, y] = ai.generateAttack(prev);
+              auto attackCoordinate = ai.generateAttack(prev);
+              if (attackCoordinate == Battleship::ErrCoord) {
+                  break;
+              }
+              auto [x, y] = attackCoordinate;
               auto turn = game->registerTurn(x, y, 1);
               qDebug().verbosity(QDebug::MaximumVerbosity)
                   << "AI made a move:" << x << y;
