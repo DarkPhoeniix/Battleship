@@ -8,28 +8,24 @@
 HostGameDialog::HostGameDialog(QWidget *parent)
     : QDialog(parent), ui(new Ui::HostGameDialog) {
   ui->setupUi(this);
-  if (!fillBlanks())
-    reject();
+  fillBlanks();
 }
 
 HostGameDialog::~HostGameDialog() { delete ui; }
 
-bool HostGameDialog::fillBlanks() {
-  auto port = getPort();
-  if (!port)
-    return false;
-  connect(this, &HostGameDialog::accepted, [this, port]() {
-    emit reportInput(port, ui->playerName->text(), ui->opponentName->text());
+void HostGameDialog::fillBlanks() {
+  connect(this, &HostGameDialog::accepted, [this]() {
+    emit reportInput(ui->clientInput->text(), ui->playerName->text(),
+                     ui->opponentName->text());
   });
   for (const auto &address : QNetworkInterface::allAddresses())
     if (address.protocol() == QAbstractSocket::IPv4Protocol &&
         address != QHostAddress::LocalHost)
-      ui->ipList->addItem(address.toString() + ":" + QString::number(port));
+      ui->ipList->addItem(address.toString());
   ui->playerName->setText(
       QString("Player ") +
       QString::number(QRandomGenerator::system()->bounded(1000, 9999)));
   ui->opponentName->setText(
       QString("Player ") +
       QString::number(QRandomGenerator::system()->bounded(1000, 9999)));
-  return true;
 }

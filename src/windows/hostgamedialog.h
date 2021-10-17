@@ -14,12 +14,11 @@ public:
   explicit HostGameDialog(QWidget *parent = nullptr);
   ~HostGameDialog();
 signals:
-  void reportInput(unsigned short port, QString playerName,
-                   QString opponentName);
+  void reportInput(QString clientIp, QString playerName, QString opponentName);
 
 private:
   Ui::HostGameDialog *ui;
-  bool fillBlanks();
+  void fillBlanks();
 };
 
 #endif // HOSTGAMEDIALOG_H

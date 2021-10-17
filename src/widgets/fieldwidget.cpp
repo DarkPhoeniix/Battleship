@@ -61,6 +61,12 @@ FieldWidget::FieldWidget(QColor gridColor, QWidget *parent)
   for (int i = 0; i < gridSize; ++i)
     for (int j = 0; j < gridSize; ++j)
       scene()->addItem(new Listener(i, j, listener));
+  connect(this, &FieldWidget::removeFieldItemsSignal, this,
+          &FieldWidget::removeFieldItems);
+  connect(this, &FieldWidget::addFieldCrossSignal, this,
+          &FieldWidget::addFieldCross);
+  connect(this, &FieldWidget::addFieldDotSignal, this,
+          &FieldWidget::addFieldDot);
 }
 
 void FieldWidget::removeFieldItems(int x, int y) {

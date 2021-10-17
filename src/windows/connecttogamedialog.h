@@ -14,8 +14,7 @@ public:
   explicit ConnectToGameDialog(QWidget *parent = nullptr);
   ~ConnectToGameDialog();
 signals:
-  void reportInput(QString playerName, QString opponentName, QString clientIp,
-                   QString hostIp, unsigned short hostPort);
+  void reportInput(QString hostIp);
 
 private:
   Ui::ConnectToGameDialog *ui;

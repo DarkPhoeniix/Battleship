@@ -14,18 +14,6 @@
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QGroupBox" name="playerNameBox">
-     <property name="title">
-      <string>Your name</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_3">
-      <item row="0" column="0">
-       <widget class="QLineEdit" name="playerName"/>
-      </item>
-     </layout>
-    </widget>
-   </item>
    <item row="2" column="0" colspan="2">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="standardButtons">
@@ -33,14 +21,18 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="QGroupBox" name="opponentNameBox">
+   <item row="0" column="0" colspan="2">
+    <widget class="QGroupBox" name="hostBox">
      <property name="title">
-      <string>Opponent name</string>
+      <string>Host address</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_4">
-      <item row="0" column="0">
-       <widget class="QLineEdit" name="opponentName"/>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="hostInput">
+        <property name="text">
+         <string>127.0.0.1</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -48,28 +40,11 @@
    <item row="1" column="0" colspan="2">
     <widget class="QGroupBox" name="ipBox">
      <property name="title">
-      <string>Network settings</string>
+      <string>Your possible addresses </string>
      </property>
-     <layout class="QFormLayout" name="formLayout">
-      <item row="1" column="1">
-       <widget class="QComboBox" name="ipInput"/>
-      </item>
+     <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
-       <widget class="QLabel" name="hostLabel">
-        <property name="text">
-         <string>Host endpoint</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="ipLabel">
-        <property name="text">
-         <string>Your address in host network</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="endpointInput"/>
+       <widget class="QListWidget" name="ipList"/>
       </item>
      </layout>
     </widget>

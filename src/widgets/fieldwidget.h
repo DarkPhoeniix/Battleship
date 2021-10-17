@@ -41,9 +41,13 @@ public:
   explicit FieldWidget(QColor gridColor);
   explicit FieldWidget(QWidget *parent);
   explicit FieldWidget(QColor gridColor, QWidget *parent);
+public slots:
   void removeFieldItems(int x, int y);
   void addFieldCross(int x, int y, QColor color = QColor(Qt::black));
   void addFieldDot(int x, int y, QColor color = QColor(Qt::black));
 signals:
   void click(int x, int y);
+  void removeFieldItemsSignal(int x, int y);
+  void addFieldCrossSignal(int x, int y, Qt::GlobalColor color = Qt::black);
+  void addFieldDotSignal(int x, int y, Qt::GlobalColor color = Qt::black);
 };

@@ -3,9 +3,11 @@
 
 #include "game/battleship/abstract_game.h"
 #include "widgets/fieldwidget.h"
+#include <QApplication>
 #include <QLCDNumber>
 #include <QLineEdit>
 #include <QMainWindow>
+#include <QMessageBox>
 #include <functional>
 #include <memory>
 
@@ -36,17 +38,18 @@ private:
   createClickHandler(std::shared_ptr<Battleship::AbstractBattleshipGame> game,
                      int playerId, PlayerUI w, bool skipMapping = false);
   void uiToGameMode();
+signals:
+  void showWinner(const QString &winner);
 private slots:
   void showScoreboardSummary();
   void startSingleScreenGame();
   void hostGame();
-  void startHostedGame(unsigned short port, QString playerName,
+  void startHostedGame(QString clientIp, QString playerName,
                        QString opponentName);
   void connectToGame();
-  void startGameAsClient(QString playerName, QString opponentName,
-                         QString clientIp, QString hostIp,
-                         unsigned short hostPort);
+  void startGameAsClient(QString hostIp);
   void startGameWithAI();
+  void showWinnerSlot(const QString &winner);
 };
 
 #endif // MAINWINDOW_H
